@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>WorldManager</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./style.css">
+    <script src='./script.js' defer></script>
+
+    <script src="./editor/editor.js"></script>
+    <script src="./editor/header.js"></script>
+    <script src="./editor/link.js"></script>
+    <script src="./editor/checklist.js"></script>
+    <script src="./editor/embed.js"></script>
+    <script src="./editor/nested-list.js"></script>
+    <script src="./editor/quote.js"></script>
+    <script src="./editor/underline.js"></script>
+    <script src="./editor/list.js"></script>
+    <script src="./editor/image.js"></script>
+    <script src="./editor/table.js"></script>
+</head>
+<body>
+    <section id="home">
+        <h1>my worlds</h1>
+        <div id="world-list"></div>
+        <div id="new-world">
+            <div class="name">
+                <input type="text" placeholder="filename" value="">
+                <div class="info-icon">&#128712;</div>
+                <p class="info">This will create a file with the name entered here, you can always change the name displayed when the world is opened. <br> The filename can only be changed by renaming it manually. This is good to know for sharing worlds.<br><br>this name can only contain: <br> "a-Z", "0-9", ".", "-" or "_"</p>
+            </div>
+            
+            <p class="button" onclick="addWorld()">new</p>
+
+            <p class="error">name can only contain "a-Z", "0-9", ".", "-", "_"</p>
+
+            <p class="close" onclick="closeAddWorldPopup()" title='close "create world"'>&#128473;</p>
+        </div>
+    </section>
+
+    <svg width="2rem" height="2rem" id="home-button" onclick="window.electronAPI.loadHome()">
+        <image xlink:href="./home.svg" src="yourfallback.png" width="2rem" height="2rem"/>    
+   </svg>
+
+    <nav>
+        
+        <input id="worldname" contenteditable="true" placeholder="Worldname" spellcheck="false" onblur="saveWorldName()">
+        
+        <ul>
+            <li onclick="changeMode(0)"><p>map</p></li>
+            <li onclick="changeMode(1)"><p>wiki</p></li>
+            
+            <div id="nav-marker"></div>
+        </ul>
+
+        <!-- <p id="save-info">everything saved</p> -->
+        <div id="toggel-editmode" onclick="toggelEditMode()">
+            <p>editing</p>
+            <p>viewing</p>
+        </div>
+
+    </nav>
+    
+    <section id="map">
+        <div id="map-controls">
+            <p onclick="openFileUpload()">swap map image</p>
+            <div>
+                <input type="range" min="10" max="30" id="zoom-slider" value="0" oninput="setMapZoom(this.value)">
+                <p id="zoom-value">100%</p>
+            </div>
+            <p onclick="addMapMarker()">add marker</p>
+            <!-- TODO add hide all markers -->
+        </div>
+
+        <p onclick="openFileUpload()" id="no-map-image-button">open map upload</p>
+
+        <div id="map-container" onmousedown="mapMouseDown()">
+            <div id="map-image"></div>
+            <div id="marker-edit-button" onmouseleave="closeMarkerHover()">
+                <div class="editbutton" onclick="editMarker()">&#10303;</div>
+            </div>
+        </div>
+
+        <div id="map-marker-editor">
+            <p class="close" onclick="closeMarkerEdit()">&#128473;</p>
+
+            <input name="marker-name" placeholder="Marker Name" type="text" class="marker-name" onfocus="this.select()">
+            <label for="marker-link">Links to:</label>
+            <select name="marker-link" class="marker-link">
+
+            </select>
+            <label for="marker-link">Type:</label>
+            <select name="marker-type" class="marker-type">
+                <option value="0">Heading</option>
+                <option value="1">Label</option>
+                <option value="2">Pinpoint</option>
+            </select>
+            <p class="save" onclick="saveMarkerEdits()">save</p>
+        </div>
+
+        <input type="file" id="map-image-input" accept="image/*">
+    </section>
+    
+    <section id="wiki">
+        <aside>
+            <p id="open-close" title="toggel tabel of contents" onclick="toggleAside()">&#11166;</p>
+
+            <div class="content">
+                <ul>
+                    <h1>category</h1>
+                    <li>entry</li>
+                    <li>entry</li>
+                </ul>
+                <ul>
+                    <h1>category</h1>
+                    <li>entry</li>
+                    <li>entry</li>
+                </ul>
+            </div>
+
+            <div id="add-entry"></div>
+        </aside>
+
+        <div id="editjs" onkeydown="contentEdited()"></div>
+    </section>
+    
+    <div id="global-cursor"></div>
+</body>
+</html>
