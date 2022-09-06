@@ -9,11 +9,12 @@ DEPENDS ON: editor.js, electron.js
 ***************************************************************************************************************/
 
 //dom calls
-const navMarker = document.getElementById('nav-marker')
+const navMarker = document.getElementById('nav-marker') //bar that indicates what view u are in
 const wiki = document.getElementById('wiki')
 const map = document.getElementById('map')
 const openClose = document.getElementById('open-close')
 const aside = document.querySelector('#wiki aside')
+const asideContent = document.querySelector('#wiki aside .content')
 const worldname = document.getElementById('worldname')
 const saveInfo = document.getElementById('save-info')
 const mapInput = document.querySelector("#map-image-input");
@@ -28,6 +29,8 @@ const globalCursorElem = document.getElementById('global-cursor')
 const worldList = document.getElementById('world-list')
 const home = document.getElementById('home')
 const newWorld = document.getElementById('new-world')
+const newWorldError = newWorld.querySelector(".error")
+const newWorldInput = newWorld.querySelector("input")
 
 let mode = 0 //0 - map, 1 - wiki
 let editmode = 0 //0 - edit, 1 - view
@@ -38,7 +41,7 @@ let asideVisible = true
 let mapMarkers = [] //json data of all map markers
 let worlds = [] //list of all worlds
 let worldFiles = [] //list of all world file names
-let wikiEntrys = [] //list of json objects of every entry
+let wikiEntries = [] //list of json objects of every entry
 
 let editor
 window.addEventListener('DOMContentLoaded', () => {
@@ -55,7 +58,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
 globalCursor("wait")//waits until content finished loading
 
-//
+//sets indicator to correct with and pos
 navMarker.style.width = `calc(${document.querySelectorAll("nav ul li p")[0].clientWidth}px + .8rem)`
 navMarker.style.left = `calc(50% - ${navMarker.clientWidth}px - 1.5rem)`
 
@@ -65,30 +68,25 @@ navMarker.style.left = `calc(50% - ${navMarker.clientWidth}px - 1.5rem)`
 
 ///tells client to collect all data and send to server for save to file
 window.electronAPI.requestSaveData((_event) => {
-  if (mode == 1) {//mode is wiki
-    saveEntry()
-  }
-
-  saveWorldName()
-  saveMarkers()
-
-  setTimeout(function () { //!REPLACE WITH PROMISE CALLS
-    window.electronAPI.save() //tells erver that all data has been sent
-  }, 100)
-
-  //UNUSED save indicator
-  /* saveInfo.style.color = "var(--nav-accent)"
-  saveInfo.innerText = "everything saved" */
-  contentSaved = true
+  saveWorld()
 })
 
 window.electronAPI.wikiEntry((_event, data) => {
   if (data != null) {
     let jsonData = JSON.parse(data)
     console.log("recieved wikientry:", jsonData);
-    if (jsonData.blocks.length > 0)
-      editor.render(jsonData)
+    if (jsonData.data.blocks.length > 0)
+      editor.render(jsonData.data)
   }
+})
+
+window.electronAPI.wikiEntryList((_event, data) => {
+  console.log("wikientries recieved", data);
+
+  
+  wikiEntries = JSON.parse(data)
+  console.log(wikiEntries);
+  reloadWikiEntries()
 })
 
 ///all the data of world that was selected
@@ -123,6 +121,11 @@ window.electronAPI.world((_event, data) => {
     };
     i.src = jsonData.map;
   }
+
+  console.log("wikientries", jsonData.entries);
+
+  wikiEntries = jsonData.entries
+  reloadWikiEntries()
 
   mapMarkers = jsonData.markers
   reloadMarker()
@@ -205,6 +208,7 @@ function toggelEditMode() {
   let markerHTML = document.querySelectorAll('.marker')
 
   //TODO function for editjs
+  editor.readOnly.toggle();
   //TODO lock of inputs
   //TODO disabel buttons (add marker etc.)
 
@@ -234,8 +238,13 @@ function toggelEditMode() {
 function contentEdited() {
   if (contentSaved == true) {
     contentSaved = false
+    //UNUSED save indicator
     /* saveInfo.innerText = "unsaved changes"
     saveInfo.style.color = "var(--text-background)" */
+
+    document.querySelector('#save-button .save').style.display = "block"
+    document.querySelector('#save-button .check').style.display = "none"
+
     window.electronAPI.setSaveStatus(0)
   }
 }
@@ -263,35 +272,63 @@ function globalCursor(cursor) {
 
 //shows adworld popup and if input is given sends worldname to server
 function addWorld() {
-  let badChars = /.[^A-z _\-\.0-9]/ //all except [A-z _ - . 0-9 " "]
-  
   newWorld.querySelector(".button").innerText = "create"
   newWorld.querySelector(".button").style.top = "3rem"
   newWorld.querySelector(".close").style.opacity = 1
   newWorld.querySelector(".name").style.opacity = 1
   
-  let newName = newWorld.querySelector("input").value
+  let newName = newWorldInput.value
   
-  if (newName != "" && newName != " ") {//if input field has value 
-    for (let i = 0; i < worldFiles.length; i++) { //check for duplicate world names
-      console.log(worldFiles[i].slice(0, -5));
-      if (newName == worldFiles[i].slice(0, -5)) {
-        console.log("double");
-        return
-      }
-    }
+  if (checkInputValue() === true) {//if input field has value 
+    console.log("WorldName: ", newName);
     
-    if (badChars.test(newName) == true) { //check if name contains invalid characters
-      console.log("bad input");
-      newWorld.querySelector(".error").style.display = "block"
-    }
-    else{
-      console.log("WorldName: ", newName);
+    window.electronAPI.addWorld(newName)
+    
+    closeAddWorldPopup()
+  }
+  else if(checkInputValue() != null){
+    newWorldInput.style.animation = "shake 0.5s"
+    setTimeout(function(){
+      newWorldInput.style.animation = ""
+    },500)
+  }
+}
+
+function checkInputValue(){
+  let badChars = /.[^A-z _\-\.0-9]/ //all except [A-z _ - . 0-9 " "]
+  let newName = newWorldInput.value
+
+  if(newName == "" || newName == " "){
+    newWorld.querySelector("input").value = ""
+    newWorldError.style.display = "none"
+
+    console.log("empty");
+    return null
+  }
+
+  for (let i = 0; i < worldFiles.length; i++) { //check for duplicate world names
+    if (newName == worldFiles[i].slice(0, -5)) {
+      newWorldError.innerText = 'another world already exists with this name'
+      newWorldError.style.display = "block"
       
-      window.electronAPI.addWorld(newName)
-      
-      closeAddWorldPopup()
+      console.log("double");
+      return false
     }
+  }
+  
+  if (badChars.test(newName) == true) { //check if name contains invalid characters
+    newWorldError.innerText = 'name can only contain "a-Z", "0-9", ".", "-", "_"'
+    newWorldError.style.display = "block"
+    
+    console.log("bad input");
+    return false
+  }
+  else{
+    newWorldError.innerText = 'no error'
+    newWorldError.style.display = "none"
+
+    console.log("valid input");
+    return true
   }
 }
 
@@ -300,8 +337,46 @@ function closeAddWorldPopup() {
   newWorld.querySelector(".button").style.top = "0"
   newWorld.querySelector(".close").style.opacity = 0
   newWorld.querySelector(".name").style.opacity = 0
-  newWorld.querySelector(".error").style.display = "none"
   newWorld.querySelector("input").value = ""
+  newWorldError.display = "none"
+}
+
+function popup(type, data){
+  document.getElementById('popup').style.display = "block"
+
+  if(type == 0){//input
+    document.querySelector('#popup .content').innerHTML = `
+    <input type="text"  placeholder="name">
+    <div class="buttons">
+        <p onclick='${data.submit}; closePopup()'>submit</p>
+        <p onclick='closePopup()'>cancel</p>
+    </div>`
+  }
+}
+
+function closePopup(){
+  document.getElementById('popup').style.display = "none"
+}
+
+function saveWorld(){
+  if (mode == 1) {//mode is wiki
+    saveEntry()
+  }
+
+  saveWorldName()
+  saveMarkers()
+
+  setTimeout(function () { //!REPLACE WITH PROMISE CALLS
+    window.electronAPI.save() //tells server that all data has been sent
+  }, 100)
+
+  //UNUSED save indicator
+  /* saveInfo.style.color = "var(--nav-accent)"
+  saveInfo.innerText = "everything saved" */
+  
+  document.querySelector('#save-button .save').style.display = "none"
+  document.querySelector('#save-button .check').style.display = "block"
+  contentSaved = true
 }
 
 //#endregion
@@ -662,8 +737,16 @@ mapInput.addEventListener("change", function () {
 //---------- WIKI ----------//
 //#region 
 
-function updateMarkers(){
+function reloadWikiEntries(){
+  let html = ""
+  for (let i = 0; i < wikiEntries.length; i++) {
+    html += `<li>${wikiEntries[i].name}</li>`
+  }
+  asideContent.innerHTML = html
+}
 
+function addEntry(){
+  popup(0, {submit: 'window.electronAPI.addEntry(document.querySelector("#popup .content input").value)'})
 }
 
 function saveEntry() {//gets data from editor

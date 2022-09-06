@@ -5,7 +5,7 @@ AUTHOR: Yanik Kendler
 DEPENDS ON: electron, fileSystem
 
 ***************************************************************************************************************/
-const uuidv4 = require("uuid/v4")
+const { v4: uuidv4 } = require('uuid');
 
 const { app, Menu, BrowserWindow, ipcMain} = require('electron')
 const fs = require('fs')
@@ -93,7 +93,7 @@ app.whenReady().then(() => {
   //saves wiki entry
   ipcMain.on('save-entry', (_event, data, id) => {
     console.log("getting new wiki data");
-    worldData.entries[0][id] = JSON.parse(data)
+    worldData.entries[id].data = JSON.parse(data)
   })
 
   //recieves world id and sends world to client
@@ -118,7 +118,7 @@ app.whenReady().then(() => {
           
           win.setMenuBarVisibility(true)
 
-          console.log("reading done", worldData);
+          sendWikiEntries()
           }
       })
     }
@@ -136,7 +136,12 @@ app.whenReady().then(() => {
     worldData = {
       "name" : name,
       "markers" : [],
-      "entries" : [[],[]],
+      "entries" : [{
+        "name" : name,
+        "category" : "world",
+        "uuid" : uuidv4(),
+        "data" : {time: Date.now(), blocks:[], version: '2.25.0'}
+      }],
       "map" : null
     }
 
@@ -147,19 +152,20 @@ app.whenReady().then(() => {
     updateJSON()
   })
 
-  ipcMain.on('add-entry', (_event, name) => {
+  ipcMain.on('add-entry', (_event, name, category) => {
     if(name == undefined) return
 
     newEntry = {
       "name" : name,
+      "category" : category,
       "uuid" : uuidv4(),
-      "data" : ""
+      "data" : {time: Date.now(), blocks:[], version: '2.25.0'}
     }
 
-    selectedWorldID = folderContent.length
-    win.webContents.send('world', JSON.stringify(worldData))
-    win.setMenuBarVisibility(true)
-    
+    worldData.entries.push(newEntry)
+
+    sendWikiEntries()
+
     updateJSON()
   })
 
@@ -167,9 +173,9 @@ app.whenReady().then(() => {
   ipcMain.on('request-wiki-entry', (_event, id) => {
     console.log("requesting entry", id);
     
-    if(worldData.entries[0][id]){//entry exists
-      console.log(worldData.entries[0][id]);
-      win.webContents.send('wiki-entry', JSON.stringify(worldData.entries[0][id]))
+    if(worldData.entries[id]){//entry exists
+      console.log(worldData.entries[id]);
+      win.webContents.send('wiki-entry', JSON.stringify(worldData.entries[id]))
     }
     else{
       win.webContents.send('wiki-entry', null)
@@ -177,7 +183,6 @@ app.whenReady().then(() => {
   })
 
   ipcMain.on('save-world-name', (_event, name) => {
-    console.log("new world name:", name);
     worldData.name = name
   })
 
@@ -203,6 +208,18 @@ app.whenReady().then(() => {
   ipcMain.on('load-home', (_event) => {
     loadHome()
   })
+
+  function sendWikiEntries(){
+    let wikiEntryList = []
+
+    worldData.entries.forEach(elem => { //construct array of only name and uuid
+      wikiEntryList.push({name: elem.name, uuid: elem.uuid})
+    });
+
+    wikiEntryList.sort()
+
+    win.webContents.send('wiki-entry-list', JSON.stringify(wikiEntryList))
+  }
   
   function loadHome(){
     if (saveStatus == 0) {/// unsaved changes

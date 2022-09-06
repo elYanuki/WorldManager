@@ -8,10 +8,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
     wikiEntry: (callback) => ipcRenderer.on('wiki-entry', callback),
     world: (callback) => ipcRenderer.on('world', callback),
     worldList: (callback) => ipcRenderer.on('world-list', callback),
+    wikiEntryList: (callback) => ipcRenderer.on('wiki-entry-list', callback),
 
     //client to server
     save: () => ipcRenderer.send('save'),
     saveEntry: (data, id) => ipcRenderer.send('save-entry', data, id),
+    addEntry: (data, name) => ipcRenderer.send('add-entry', data, name),
     requestWikiEntry: (id) => ipcRenderer.send('request-wiki-entry', id),
     selectWorld: (id) => ipcRenderer.send('select-world', id),
     saveWorldName: (name) => ipcRenderer.send('save-world-name', name),

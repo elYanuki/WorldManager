@@ -25,7 +25,7 @@
         <div id="world-list"></div>
         <div id="new-world">
             <div class="name">
-                <input type="text" placeholder="filename" value="">
+                <input type="text" placeholder="filename" value="" onkeyup="checkInputValue()">
                 <div class="info-icon">&#128712;</div>
                 <p class="info">This will create a file with the name entered here, you can always change the name displayed when the world is opened. <br> The filename can only be changed by renaming it manually. This is good to know for sharing worlds.<br><br>this name can only contain: <br> "a-Z", "0-9", ".", "-" or "_"</p>
             </div>
@@ -38,13 +38,15 @@
         </div>
     </section>
 
-    <svg width="2rem" height="2rem" id="home-button" onclick="window.electronAPI.loadHome()">
-        <image xlink:href="./home.svg" src="yourfallback.png" width="2rem" height="2rem"/>    
-   </svg>
+    <div id="home-button" class="extern-nav-button">
+        <svg width="2rem" height="2rem" onclick="window.electronAPI.loadHome()">
+            <image xlink:href="./icons/home.svg" src="yourfallback.png" width="2rem" height="2rem"/>
+        </svg>
+    </div>
 
     <nav>
         
-        <input id="worldname" contenteditable="true" placeholder="Worldname" spellcheck="false" onblur="saveWorldName()">
+        <input id="worldname" placeholder="Worldname" spellcheck="false" onblur="saveWorldName()" onkeydown="contentEdited()">
         
         <ul>
             <li onclick="changeMode(0)"><p>map</p></li>
@@ -53,6 +55,7 @@
             <div id="nav-marker"></div>
         </ul>
 
+        <!-- UNUSED Save inicator -->
         <!-- <p id="save-info">everything saved</p> -->
         <div id="toggel-editmode" onclick="toggelEditMode()">
             <p>editing</p>
@@ -60,6 +63,16 @@
         </div>
 
     </nav>
+
+    <div id="save-button" class="extern-nav-button">
+        <svg width="1.8rem" height="1.8rem" onclick="saveWorld()" class="save">
+            <image xlink:href="./icons/save.svg" src="yourfallback.png" width="1.8rem" height="1.8rem"/>
+        </svg>
+
+        <svg width="1.5rem" height="1.5rem" onclick="saveWorld()" class="check">
+            <image xlink:href="./icons/check.svg" src="yourfallback.png" width="1.5rem" height="1.5rem"/>
+        </svg>
+    </div>
     
     <section id="map">
         <div id="map-controls">
@@ -69,7 +82,7 @@
                 <p id="zoom-value">100%</p>
             </div>
             <p onclick="addMapMarker()">add marker</p>
-            <!-- TODO add hide all markers -->
+            <!-- TODO add hide all markers button -->
         </div>
 
         <p onclick="openFileUpload()" id="no-map-image-button">open map upload</p>
@@ -105,24 +118,20 @@
         <aside>
             <p id="open-close" title="toggel tabel of contents" onclick="toggleAside()">&#11166;</p>
 
-            <div class="content">
-                <ul>
-                    <h1>category</h1>
-                    <li>entry</li>
-                    <li>entry</li>
-                </ul>
-                <ul>
-                    <h1>category</h1>
-                    <li>entry</li>
-                    <li>entry</li>
-                </ul>
-            </div>
+            <div class="content"></div>
 
-            <div id="add-entry"></div>
+            <div id="add-entry" onclick="addEntry()">+</div>
+
+            <!-- <div id="add-category">new Category</div> -->
         </aside>
 
         <div id="editjs" onkeydown="contentEdited()"></div>
     </section>
+
+    <div id="popup">
+        <div class="content">
+        </div>
+    </div>
     
     <div id="global-cursor"></div>
 </body>

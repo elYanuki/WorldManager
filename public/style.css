@@ -11,8 +11,12 @@
     color: rgb(75, 73, 68) !important;
 }
 
-input:focus{
+input[type=text]:focus{
     outline: 2px solid var(--color-accent);
+}
+
+option:hover{
+    background-color: var(--color-accent);
 }
 
 img{
@@ -20,7 +24,6 @@ img{
 }
 
 /************ Main Style ************/
-
 body{
     background-color: #8d785f;
     overflow-x: hidden;
@@ -35,23 +38,95 @@ body{
     z-index: 1000;
 }
 
-#home-button{
+.extern-nav-button{
     position: absolute;
+    top: 0;
     background-color: var(--nav-background);
-    border-bottom-right-radius: 1rem;
     box-shadow: var(--shadow-0);
-    padding: .2rem;
-    padding-bottom: 0;
     cursor: pointer;
     z-index: 250;
     transition: all .2s;
+    height: 2.3rem;
+    width: 2.3rem;
+    display: grid;
+    place-content: center;
+}
+
+#home-button{
+    border-bottom-right-radius: 1rem;
+    left: 0;
 }
 
 #home-button:hover{
     transform: scale(1.05);
 }
 
+#save-button{
+    border-bottom-left-radius: 1rem;
+    right: 0;
+}
+
+#save-button:hover{
+    transform: scale(1.05);
+}
+
+#save-button .save{
+    display: none;
+}
+
+/*---------- popup ----------*/
+
+#popup{
+    display: none;
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.4);
+    height: 100vh;
+    width: 100vw;
+    z-index: 800;
+    top: 0;
+}
+
+#popup .content{
+    position: absolute;
+    top: 50vh;
+    left: 50vw;
+    transform: translate(-50%, -50%);
+    background-color: var(--nav-background);
+    padding: 1rem;
+    border-radius: .5rem;
+    box-shadow: var(--shadow-1);
+}
+
+#popup .buttons{
+    display: flex;
+    justify-content: space-evenly;
+    margin-top: .5rem;
+}
+
+#popup .buttons p{
+    padding: .3rem .6rem;
+    border-radius: .3rem;
+    background-color: rgb(116, 99, 80);
+    box-shadow: var(--shadow-0);
+    color: var(--text-accent);
+    cursor: pointer;
+}
+
+#popup input{
+    padding: .3rem;
+    background-color: rgb(116, 99, 80);
+    border: none;
+    color: var(--text-background);
+    border-radius: .3rem;
+}
+
+#popup input::placeholder{
+    color: rgb(161, 153, 125);
+}
+
 /*---------- homescreen ----------*/
+
+/* #region */
 
 #home{
     position: absolute;
@@ -158,7 +233,7 @@ body{
 #new-world .error{
     color: var(--color-alert);
     position: absolute;
-    top: 6rem;
+    top: -1.5rem;
     left: 50%;
     transform: translateX(-50%);
     text-align: center;
@@ -229,12 +304,15 @@ body{
     z-index: 500;
 }
 
+/* #endregion */
+
 /*---------- map ----------*/
+
 /* #region */
 #map{
     width: 100vw;
     height: 100vh;
-    transition: left .8s;
+    transition: left .5s;
     position: absolute;
     top: 0;
     left: 0;
@@ -255,7 +333,7 @@ body{
     box-shadow: var(--shadow-1);
     z-index: 100;
     opacity: 0;
-    transition: all 1s;
+    /* transition: all 1s; */
     color: rgb(107, 100, 83);
 }
 
@@ -490,10 +568,12 @@ body{
 /* #endregion */
 
 /*---------- wiki ----------*/
+
 /* #region */
+
 #wiki{
     width: 100%;
-    transition: left .8s;
+    transition: left .5s;
     position: absolute;
     width: 100vw;
     height: auto;
@@ -530,7 +610,7 @@ body{
 #wiki aside{
     position: absolute;
     left: -1vw;
-    background-color: var(--edit-color);
+    background-color: var(--edit-color) ;
     border-radius: 1rem;
     min-width: 1rem;
     min-height: .7rem;
@@ -552,19 +632,6 @@ body{
     font-weight: bold;
     color: rgb(68, 62, 47);
     width: 100%;
-} 
-
-#wiki aside h1::after{
-    content: "+"; /* change to cool icon (unicode ?) */
-    font-size: 1.2rem;
-    margin-left: .5rem;
-    opacity: 0;
-    transition: opacity .3s;
-    /* add clicky clacki */
-}
-
-#wiki aside ul:hover h1::after{
-    opacity: 1;
 }
 
 #wiki aside ul li{
@@ -574,6 +641,20 @@ body{
 
 #wiki aside ul li::marker{
     color: rgb(124, 117, 97);
+}
+
+#wiki aside #add-category{
+
+}
+
+#wiki aside #add-entry{
+    font-weight: bold;
+    font-size: 1.3rem;
+    height: 1.3rem;
+    text-align: center;
+    border-radius: .3rem;
+    background-color: rgb(194, 179, 155);
+    cursor: pointer;
 }
 
 #wiki aside #open-close{
@@ -785,6 +866,20 @@ nav ul li::marker{
 
 /************ Keyframes ************/
 
+@keyframes shake {
+    0% { transform: translate(1px, 1px) rotate(0deg); }
+    10% { transform: translate(-1px, -2px) rotate(-1deg); }
+    20% { transform: translate(-3px, 0px) rotate(1deg); }
+    30% { transform: translate(3px, 2px) rotate(0deg); }
+    40% { transform: translate(1px, -1px) rotate(1deg); }
+    50% { transform: translate(-1px, 2px) rotate(-1deg); }
+    60% { transform: translate(-3px, 1px) rotate(0deg); }
+    70% { transform: translate(3px, 1px) rotate(-1deg); }
+    80% { transform: translate(-1px, -1px) rotate(1deg); }
+    90% { transform: translate(1px, 2px) rotate(0deg); }
+    100% { transform: translate(1px, -2px) rotate(-1deg); }
+}
+
 /************ Responsive ************/
 @media screen and (min-width: 800px) { /*pc*/
     main{
@@ -801,12 +896,12 @@ nav ul li::marker{
 :root {
     --text-background: rgb(233, 225, 199);
     --text-accent:#beb092;
-    --color-alert: rgb(185, 19, 19);
+    --color-alert: rgb(177, 51, 51);
 
     --nav-background: rgb(122, 104, 83);
     /* --nav-accent: rgb(94, 80, 61); */
     --nav-accent: rgb(201, 192, 158);
-    --nav-hover: rgb(168, 160, 133);
+    --nav-hover: rgb(168, 156, 133);
 
     --color-contrast: rgb(24, 11, 6);
 
@@ -830,13 +925,13 @@ nav ul li::marker{
     0rem .5rem .7rem var(--marker-edit-color), .5rem 0rem .7rem var(--marker-edit-color), 0rem -.5rem .7rem var(--marker-edit-color), -.5rem 0rem .7rem var(--marker-edit-color);
 
     --marker-shadow-color: #e7dfc5;
-    --marker-edit-color: #2baaff;
+    --marker-edit-color: var(--color-accent);
 
-    --color-accent: #2baaff;
+    --color-accent: /* #2baaff */ #eb9c43;
 
     --edit-color: rgb(212, 205, 183);
     --popup-color-main: rgb(216, 207, 187);
-    --popup-color-icon: rgb(200, 200, 171);
+    --popup-color-icon: rgb(200, 192, 171);
     --popup-color-selected: var(--popup-color-icon);
 
     --table-add-hover: rgb(234, 234, 210);
