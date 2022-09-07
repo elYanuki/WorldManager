@@ -29,7 +29,7 @@ let selectedWorldID = 0 // id of selected world in list of worlds read from stor
 
 let saveStatus = 1 // 1 if everything is saved - used for popup on close
 
-let folderContent // array of json file names read from storrage
+let folderContent = []// array of json file names read from storrage
 let worldList = [] // array of actuall world names read from json files above
 
 let worldPath // path to json file of selected world
@@ -57,7 +57,7 @@ const createWindow = () => {
     })
 
     win.on('ready-to-show', () => {
-      win.webContents.send('world-list', JSON.stringify(worldList), JSON.stringify(folderContent))
+      sendWorldList()
       win.show()
     })
 
@@ -90,12 +90,6 @@ app.whenReady().then(() => {
     console.log("client to server recieved");
   })
 
-  //saves wiki entry
-  ipcMain.on('save-entry', (_event, data, id) => {
-    console.log("getting new wiki data");
-    worldData.entries[id].data = JSON.parse(data)
-  })
-
   //recieves world id and sends world to client
   ipcMain.on('select-world', (_event, id) => {
     worldData = {}
@@ -105,13 +99,13 @@ app.whenReady().then(() => {
     worldPath = managerFolder + "/" + folderContent[id]
     
     console.log("selecting world", id, "at", worldPath);
-
     
     if (fs.existsSync(worldPath)) { //checks if selected world exists
       fs.readFile(worldPath, 'utf-8', (err, data_string) => {
         if (err) throw err;
         if(data_string != null && data_string != undefined && data_string != ""){
           worldData = JSON.parse(data_string)
+          console.log(worldData);
           
           selectedWorldID = id
           win.webContents.send('world', JSON.stringify(worldData))
@@ -119,6 +113,8 @@ app.whenReady().then(() => {
           win.setMenuBarVisibility(true)
 
           sendWikiEntries()
+
+          win.webContents.send('wiki-entry', JSON.stringify(worldData.entries[0]))
           }
       })
     }
@@ -168,18 +164,38 @@ app.whenReady().then(() => {
 
     updateJSON()
   })
-
+  
   //tells server to send next wiki entry
-  ipcMain.on('request-wiki-entry', (_event, id) => {
+  ipcMain.on('select-entry', (_event, id) => {
     console.log("requesting entry", id);
+
+    console.log(worldData.entries);
+
+    for (let i = 0; i < worldData.entries.length; i++) {
+      if(worldData.entries[i].uuid == id){
+        win.webContents.send('wiki-entry', JSON.stringify(worldData.entries[i]))
+        console.log("found", worldData.entries[i].data.blocks);
+        return
+      }
+    }
     
-    if(worldData.entries[id]){//entry exists
-      console.log(worldData.entries[id]);
-      win.webContents.send('wiki-entry', JSON.stringify(worldData.entries[id]))
+    console.log("entry doesnt exist");
+    win.webContents.send('wiki-entry', null)
+  })
+  
+  //saves wiki entry
+  ipcMain.on('save-entry', (_event, data, id) => {
+    console.log("getting new wiki data");
+
+    for (let i = 0; i < worldData.entries.length; i++) {
+      if(worldData.entries[i].uuid == id){
+        worldData.entries[i].data = JSON.parse(data)
+        console.log("found");
+        return
+      }
     }
-    else{
-      win.webContents.send('wiki-entry', null)
-    }
+    
+    console.log("entry doesnt exist");
   })
 
   ipcMain.on('save-world-name', (_event, name) => {
@@ -203,6 +219,7 @@ app.whenReady().then(() => {
   ipcMain.on('save', (_event) => {
     updateJSON()
     saveStatus = 1
+    //TODO possible problem when saving of entry takes too long data gets write nbefore entry is recieved
   })
 
   ipcMain.on('load-home', (_event) => {
@@ -235,16 +252,14 @@ app.whenReady().then(() => {
         if(data.response == 1){//dont save
           worldData = {} //makes sure data is cleared
   
-          win.setMenuBarVisibility(false)
-          win.webContents.send('world-list', JSON.stringify(worldList), JSON.stringify(folderContent))
+          sendWorldList()
   
           saveStatus = 1 //everything saved
         }
       })
     }
     else{//no unsaved changes
-      win.setMenuBarVisibility(false)
-      win.webContents.send('world-list', JSON.stringify(worldList), JSON.stringify(folderContent))
+      sendWorldList()
     }
   }
 
@@ -277,7 +292,7 @@ app.whenReady().then(() => {
       fs.mkdirSync(managerFolder);
     }
     else{
-      folderContent =  fs.readdirSync(managerFolder)
+      folderContent =  fs.readdirSync(managerFolder) ? fs.readdirSync(managerFolder) : []
   
       for (let i = 0; i < folderContent.length; i++) {//reads content of every file and constructs array of worldnames
         if (fs.existsSync(managerFolder + "/" + folderContent[i])) {
@@ -321,8 +336,7 @@ function deleteWorld(){
                 worldList[i] = JSON.parse(data_string).name
                 
                 if(i == folderContent.length-1){ //all worldnames collected - sending new world list to client
-                  win.setMenuBarVisibility(false)
-                  win.webContents.send('world-list', JSON.stringify(worldList), JSON.stringify(folderContent))
+                  sendWorldList()
                 }
             })
           }
@@ -331,6 +345,11 @@ function deleteWorld(){
     }
   })
 
+}
+
+function sendWorldList(){
+  win.setMenuBarVisibility(false)
+  win.webContents.send('world-list', JSON.stringify(worldList), JSON.stringify(folderContent))
 }
 
 const isMac = process.platform === 'darwin' //donno man copied tis
@@ -420,7 +439,7 @@ Menu.setApplicationMenu(menu)
 
 ///Writes all data from "WorldData" variable into world file located in "ManagerFolder"
 function updateJSON(){
-  console.log("updating json - data: ", worldData);
+  console.log("updating json, data: ", worldData);
   fs.writeFile(worldPath, JSON.stringify(worldData, null, 2), 'utf8', (error=>{
     if(error) throw error;
   }))

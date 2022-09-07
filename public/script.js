@@ -1,4 +1,3 @@
-
 /**************************************************************************************************************
 
 USE: clientsied functions of worldmanger recieves data from server and displays it gets data updates from client and sends them to server
@@ -9,33 +8,32 @@ DEPENDS ON: editor.js, electron.js
 ***************************************************************************************************************/
 
 //dom calls
-const navMarker = document.getElementById('nav-marker') //bar that indicates what view u are in
-const wiki = document.getElementById('wiki')
-const map = document.getElementById('map')
-const openClose = document.getElementById('open-close')
-const aside = document.querySelector('#wiki aside')
-const asideContent = document.querySelector('#wiki aside .content')
-const worldname = document.getElementById('worldname')
-const saveInfo = document.getElementById('save-info')
-const mapInput = document.querySelector("#map-image-input");
-const mapImage = document.querySelector("#map-image");
-const noMapImageButton = document.getElementById('no-map-image-button')
-const mapControls = document.getElementById('map-controls')
-const mapContainer = document.getElementById('map-container')
-const markerEditButton = document.getElementById('marker-edit-button')
-const markerEditor = document.getElementById('map-marker-editor')
-const editModeToggel = document.getElementById('toggel-editmode')
-const globalCursorElem = document.getElementById('global-cursor')
-const worldList = document.getElementById('world-list')
-const home = document.getElementById('home')
-const newWorld = document.getElementById('new-world')
+const navMarker = document.getElementById("nav-marker") //bar that indicates what view u are in
+const wiki = document.getElementById("wiki")
+const map = document.getElementById("map")
+const openClose = document.getElementById("open-close")
+const aside = document.querySelector("#wiki aside")
+const asideContent = document.querySelector("#wiki aside .content")
+const worldname = document.getElementById("worldname")
+const saveInfo = document.getElementById("save-info")
+const mapInput = document.querySelector("#map-image-input")
+const mapImage = document.querySelector("#map-image")
+const noMapImageButton = document.getElementById("no-map-image-button")
+const mapControls = document.getElementById("map-controls")
+const mapContainer = document.getElementById("map-container")
+const markerEditButton = document.getElementById("marker-edit-button")
+const markerEditor = document.getElementById("map-marker-editor")
+const editModeToggel = document.getElementById("toggel-editmode")
+const globalCursorElem = document.getElementById("global-cursor")
+const worldList = document.getElementById("world-list")
+const home = document.getElementById("home")
+const newWorld = document.getElementById("new-world")
 const newWorldError = newWorld.querySelector(".error")
 const newWorldInput = newWorld.querySelector("input")
 
 let mode = 0 //0 - map, 1 - wiki
 let editmode = 0 //0 - edit, 1 - view
 let contentSaved = true
-
 let asideVisible = true
 
 let mapMarkers = [] //json data of all map markers
@@ -43,28 +41,32 @@ let worlds = [] //list of all worlds
 let worldFiles = [] //list of all world file names
 let wikiEntries = [] //list of json objects of every entry
 
+let currentEntry = undefined
+
 let editor
-window.addEventListener('DOMContentLoaded', () => {
+window.addEventListener("DOMContentLoaded", () => {
   initEditor()
 
   //exits and confirms worldname on enter press
   worldname.addEventListener("keypress", function (event) {
     if (event.key === "Enter") {
-      event.preventDefault();
+      event.preventDefault()
       worldname.blur()
     }
-  });
+  })
 })
 
-globalCursor("wait")//waits until content finished loading
+globalCursor("wait") //waits until content finished loading
 
 //sets indicator to correct with and pos
-navMarker.style.width = `calc(${document.querySelectorAll("nav ul li p")[0].clientWidth}px + .8rem)`
+navMarker.style.width = `calc(${
+  document.querySelectorAll("nav ul li p")[0].clientWidth
+}px + .8rem)`
 navMarker.style.left = `calc(50% - ${navMarker.clientWidth}px - 1.5rem)`
 
 //---------- DATA FROM SERVER ----------//
 
-//#region 
+//#region
 
 ///tells client to collect all data and send to server for save to file
 window.electronAPI.requestSaveData((_event) => {
@@ -74,55 +76,60 @@ window.electronAPI.requestSaveData((_event) => {
 window.electronAPI.wikiEntry((_event, data) => {
   if (data != null) {
     let jsonData = JSON.parse(data)
-    console.log("recieved wikientry:", jsonData);
-    if (jsonData.data.blocks.length > 0)
+    console.log("recieved wikientry:", jsonData)
+    currentEntry = jsonData.uuid
+
+    if(jsonData.data.blocks.length > 0){
       editor.render(jsonData.data)
+    }
+    else{
+      editor.clear()
+    }
   }
 })
 
 window.electronAPI.wikiEntryList((_event, data) => {
-  console.log("wikientries recieved", data);
+  console.log("wikientries recieved")
 
-  
   wikiEntries = JSON.parse(data)
-  console.log(wikiEntries);
+  console.log(wikiEntries)
   reloadWikiEntries()
 })
 
 ///all the data of world that was selected
 window.electronAPI.world((_event, data) => {
-  console.log("recieved world");
+  let jsonData = JSON.parse(data)
 
-  home.style.display = "none"//hides homescreen
+  console.log("recieved world", jsonData)
+
+  home.style.display = "none" //hides homescreen
 
   //clears all fields in case one set of data is non existent in newly loadet world (eg. no wiki data would result in the previous one still beeing displayed)
-  mapImage.style.backgroundImage = ``;
+  mapImage.style.backgroundImage = ``
   noMapImageButton.style.display = "block"
   mapImage.style.display = "none"
   mapControls.style.opacity = 0
   mapMarkers = {}
-  editor.blocks.clear()
   setMapZoom(10)
-
-  let jsonData = JSON.parse(data)
 
   worldname.value = jsonData.name
 
-  if(jsonData.map != null) { //null is default non existen value
-    mapImage.style.backgroundImage = `url(${jsonData.map})`;
+  if (jsonData.map != null) {
+    //null is default non existen value
+    mapImage.style.backgroundImage = `url(${jsonData.map})`
     noMapImageButton.style.display = "none"
     mapImage.style.display = "block"
     mapControls.style.opacity = 1
 
     //reads size of string encodet image
-    var i = new Image();
+    var i = new Image()
     i.onload = function () {
       mapImage.style.aspectRatio = i.width + " / " + i.height //making zooming or overflow cool or smth idk anymore
-    };
-    i.src = jsonData.map;
+    }
+    i.src = jsonData.map
   }
 
-  console.log("wikientries", jsonData.entries);
+  console.log("wikientries", jsonData.entries)
 
   wikiEntries = jsonData.entries
   reloadWikiEntries()
@@ -130,32 +137,30 @@ window.electronAPI.world((_event, data) => {
   mapMarkers = jsonData.markers
   reloadMarker()
 
-  window.electronAPI.requestWikiEntry(0)
-
-  globalCursor("initial")//loading done curser normal
+  globalCursor("initial") //loading done curser normal
 })
 
 //recieves and saves list of all world names
 window.electronAPI.worldList((_event, names, files) => {
+  worlds = names ? JSON.parse(names) : []
+  worldFiles = files ? JSON.parse(files) : []
 
-  worlds = JSON.parse(names)
-  worldFiles = JSON.parse(files)
-
-  console.log("recieved world list", worlds, worldFiles);
+  console.log("recieved world list", worlds, worldFiles)
 
   loadWorldList()
 
-  globalCursor("initial")//needet for inital loading
+  globalCursor("initial") //needet for inital loading
 })
 
 //shows homescreen and loads world list
 function loadWorldList() {
-  home.style.display = 'grid'
+  home.style.display = "grid"
 
-  if (worlds.length == 0) {// no worlds existing
-    worldList.innerHTML = "<p class='empty' titel='enter world'>nothing here yet</p>"
-  }
-  else {
+  if (worlds.length == 0) {
+    // no worlds existing
+    worldList.innerHTML =
+      "<p class='empty' titel='enter world'>nothing here yet</p>"
+  } else {
     let html = ""
     for (let i = 0; i < worlds.length; i++) {
       html += `<div onclick="window.electronAPI.selectWorld(${i})"><p class="text">${worlds[i]}</p><p class="delete" title="delete world">&#128473;</p></div>`
@@ -177,7 +182,7 @@ function templateClientToServer() {
 //#endregion
 
 //---------- GENERAL ----------//
-//#region 
+//#region
 
 function changeMode(to) {
   let ps = document.querySelectorAll("nav ul li p")
@@ -186,14 +191,15 @@ function changeMode(to) {
   let elemWidth = ps[mode].clientWidth
   navMarker.style.width = `calc(${elemWidth}px + .8rem)`
 
-  if (to == 0) { //to map
+  if (to == 0) {
+    //to map
     navMarker.style.left = `calc(50% - ${navMarker.clientWidth}px - 1.5rem)`
     ps[1].style.color = "var(--nav-accent)"
     ps[0].style.color = "var(--text-background"
     map.style.left = 0
     wiki.style.left = "120%"
-  }
-  else if (to == 1) { //to wiki
+  } else if (to == 1) {
+    //to wiki
     navMarker.style.left = "50%"
     ps[0].style.color = "var(--nav-accent)"
     ps[1].style.color = "var(--text-background)"
@@ -205,30 +211,31 @@ function changeMode(to) {
 //switches between editing or viewing content
 function toggelEditMode() {
   let ps = editModeToggel.querySelectorAll("p")
-  let markerHTML = document.querySelectorAll('.marker')
+  let markerHTML = document.querySelectorAll(".marker")
 
   //TODO function for editjs
-  editor.readOnly.toggle();
+  editor.readOnly.toggle()
   //TODO lock of inputs
   //TODO disabel buttons (add marker etc.)
 
-  if (editmode == 1) {//view to edit
+  if (editmode == 1) {
+    //view to edit
     editmode = 0
     ps[1].style.top = "100%"
     ps[0].style.top = 0
 
-    markerHTML.forEach(elem => {
+    markerHTML.forEach((elem) => {
       elem.classList.add("cursor-move")
-    });
-  }
-  else if (editmode == 0) {//edit to view
+    })
+  } else if (editmode == 0) {
+    //edit to view
     editmode = 1
     ps[1].style.top = 0
     ps[0].style.top = "-100%"
 
-    markerHTML.forEach(elem => {
+    markerHTML.forEach((elem) => {
       elem.classList.remove("cursor-move")
-    });
+    })
   }
 }
 
@@ -242,8 +249,8 @@ function contentEdited() {
     /* saveInfo.innerText = "unsaved changes"
     saveInfo.style.color = "var(--text-background)" */
 
-    document.querySelector('#save-button .save').style.display = "block"
-    document.querySelector('#save-button .check').style.display = "none"
+    document.querySelector("#save-button .save").style.display = "block"
+    document.querySelector("#save-button .check").style.display = "none"
 
     window.electronAPI.setSaveStatus(0)
   }
@@ -263,10 +270,9 @@ function vwToPx(vw) {
 function globalCursor(cursor) {
   globalCursorElem.style.cursor = cursor
   if (cursor == "initial") {
-    globalCursorElem.style.pointerEvents = "none";
-  }
-  else {
-    globalCursorElem.style.pointerEvents = "auto";
+    globalCursorElem.style.pointerEvents = "none"
+  } else {
+    globalCursorElem.style.pointerEvents = "auto"
   }
 }
 
@@ -276,58 +282,61 @@ function addWorld() {
   newWorld.querySelector(".button").style.top = "3rem"
   newWorld.querySelector(".close").style.opacity = 1
   newWorld.querySelector(".name").style.opacity = 1
-  
+
   let newName = newWorldInput.value
-  
-  if (checkInputValue() === true) {//if input field has value 
-    console.log("WorldName: ", newName);
-    
+
+  if (checkInputValue() === true) {
+    //if input field has value
+    console.log("WorldName: ", newName)
+
     window.electronAPI.addWorld(newName)
-    
+
     closeAddWorldPopup()
   }
-  else if(checkInputValue() != null){
+  else if (checkInputValue() != null) {
     newWorldInput.style.animation = "shake 0.5s"
-    setTimeout(function(){
+    setTimeout(function () {
       newWorldInput.style.animation = ""
-    },500)
+    }, 500)
   }
 }
 
-function checkInputValue(){
+function checkInputValue() {
   let badChars = /.[^A-z _\-\.0-9]/ //all except [A-z _ - . 0-9 " "]
   let newName = newWorldInput.value
 
-  if(newName == "" || newName == " "){
+  if (newName == "" || newName == " ") {
     newWorld.querySelector("input").value = ""
     newWorldError.style.display = "none"
 
-    console.log("empty");
+    console.log("empty")
     return null
   }
 
-  for (let i = 0; i < worldFiles.length; i++) { //check for duplicate world names
+  for (let i = 0; i < worldFiles.length; i++) {
+    //check for duplicate world names
     if (newName == worldFiles[i].slice(0, -5)) {
-      newWorldError.innerText = 'another world already exists with this name'
+      newWorldError.innerText = "another world already exists with this name"
       newWorldError.style.display = "block"
-      
-      console.log("double");
+
+      console.log("double")
       return false
     }
   }
-  
-  if (badChars.test(newName) == true) { //check if name contains invalid characters
-    newWorldError.innerText = 'name can only contain "a-Z", "0-9", ".", "-", "_"'
+
+  if (badChars.test(newName) == true) {
+    //check if name contains invalid characters
+    newWorldError.innerText =
+      'name can only contain "a-Z", "0-9", ".", "-", "_"'
     newWorldError.style.display = "block"
-    
-    console.log("bad input");
+
+    console.log("bad input")
     return false
-  }
-  else{
-    newWorldError.innerText = 'no error'
+  } else {
+    newWorldError.innerText = "no error"
     newWorldError.style.display = "none"
 
-    console.log("valid input");
+    console.log("valid input")
     return true
   }
 }
@@ -341,11 +350,12 @@ function closeAddWorldPopup() {
   newWorldError.display = "none"
 }
 
-function popup(type, data){
-  document.getElementById('popup').style.display = "block"
+function popup(type, data) {
+  document.getElementById("popup").style.display = "block"
 
-  if(type == 0){//input
-    document.querySelector('#popup .content').innerHTML = `
+  if (type == 0) {
+    //input
+    document.querySelector("#popup .content").innerHTML = `
     <input type="text"  placeholder="name">
     <div class="buttons">
         <p onclick='${data.submit}; closePopup()'>submit</p>
@@ -354,62 +364,71 @@ function popup(type, data){
   }
 }
 
-function closePopup(){
-  document.getElementById('popup').style.display = "none"
+function closePopup() {
+  document.getElementById("popup").style.display = "none"
 }
 
-function saveWorld(){
-  if (mode == 1) {//mode is wiki
-    saveEntry()
+function saveWorld() {
+  if (mode == 1) {
+    //mode is wiki
+    swapEntry("save")
   }
 
   saveWorldName()
   saveMarkers()
 
-  setTimeout(function () { //!REPLACE WITH PROMISE CALLS
+  setTimeout(function () {
+    //!REPLACE WITH PROMISE CALLS
     window.electronAPI.save() //tells server that all data has been sent
   }, 100)
 
   //UNUSED save indicator
   /* saveInfo.style.color = "var(--nav-accent)"
   saveInfo.innerText = "everything saved" */
-  
-  document.querySelector('#save-button .save').style.display = "none"
-  document.querySelector('#save-button .check').style.display = "block"
+
+  document.querySelector("#save-button .save").style.display = "none"
+  document.querySelector("#save-button .check").style.display = "block"
   contentSaved = true
 }
 
 //#endregion
 
 //---------- MAP ----------//
-//#region 
+//#region
 let mapZoom = 1
 
-let startpos = { "x": 0, "y": 0, "top": 0, "left": 0 } //safes pos of cursor (x, y) and scroll in contianer (top, left)
+let startpos = { x: 0, y: 0, top: 0, left: 0 } //safes pos of cursor (x, y) and scroll in contianer (top, left)
 
 function setMapZoom(value) {
   mapZoom = value / 10
 
-  document.getElementById('zoom-value').innerText = Math.floor(mapZoom * 100) + '%' //displays zoom
-  
-  
-  let safedSize = { //size of image before zoom change (image size change)
-    "height": parseFloat(mapImage.clientHeight),
-    "width": parseFloat(mapImage.clientWidth)
+  document.getElementById("zoom-value").innerText =
+    Math.floor(mapZoom * 100) + "%" //displays zoom
+
+  let safedSize = {
+    //size of image before zoom change (image size change)
+    height: parseFloat(mapImage.clientHeight),
+    width: parseFloat(mapImage.clientWidth),
   }
 
   mapImage.style.width = 70 * mapZoom + "vw" ///changes image size (zoom in)
 
-  if (mapZoom == 1 && mapImage.clientHeight < mapContainer.clientHeight) { mapContainer.style.cursor = 'default' } //cursor reset if map is not zoomed in
-  else mapContainer.style.cursor = 'grab' //since image is zoomed in user should know its movable
+  if (mapZoom == 1 && mapImage.clientHeight < mapContainer.clientHeight) {
+    mapContainer.style.cursor = "default"
+  } //cursor reset if map is not zoomed in
+  else mapContainer.style.cursor = "grab" //since image is zoomed in user should know its movable
 
   //kinda lets you zoom into the center of the old view not the top corner
   //TODO improve centered zoom in
-  mapContainer.scrollTop = parseFloat(mapContainer.scrollTop) + (parseFloat(mapImage.clientHeight) - safedSize.height) / 2 
-  mapContainer.scrollLeft = parseFloat(mapContainer.scrollLeft) + (parseFloat(mapImage.clientWidth) - safedSize.width) / 2
+  mapContainer.scrollTop =
+    parseFloat(mapContainer.scrollTop) +
+    (parseFloat(mapImage.clientHeight) - safedSize.height) / 2
+  mapContainer.scrollLeft =
+    parseFloat(mapContainer.scrollLeft) +
+    (parseFloat(mapImage.clientWidth) - safedSize.width) / 2
 
   //moves markers acording to new image size
-  let markerHTML = mapContainer.querySelectorAll('.marker')
+  let markerHTML = mapContainer.querySelectorAll(".marker")
   for (let i = 0; i < mapMarkers.length; i++) {
     markerHTML[i].style.top = mapMarkers[i].top * mapZoom + "vw"
     markerHTML[i].style.left = mapMarkers[i].left * mapZoom + "vw"
@@ -419,39 +438,42 @@ function setMapZoom(value) {
 }
 
 function mapMouseDown(e) {
-  e = e || window.event;
+  e = e || window.event
 
-  if (mapZoom != 1 && e.target.closest('#map-image')) { //have nothing happen if zoom is 0 and user is clicking on the image
-    console.log("starting drag map");
+  if (mapZoom != 1 && e.target.closest("#map-image")) {
+    //have nothing happen if zoom is 0 and user is clicking on the image
+    console.log("starting drag map")
 
-    e.preventDefault();
-    
+    e.preventDefault()
+
     // get the mouse cursor position at startup:
     startpos.x = e.clientX
     startpos.y = e.clientY
     startpos.top = mapContainer.scrollTop
     startpos.left = mapContainer.scrollLeft
 
-    mapContainer.style.cursor = 'grabbing';
-    mapContainer.style.userSelect = 'none';
+    mapContainer.style.cursor = "grabbing"
+    mapContainer.style.userSelect = "none"
 
-    document.onmouseup = closeDragMap; //stop dragging
-    document.onmousemove = dragMap; //move map
+    document.onmouseup = closeDragMap //stop dragging
+    document.onmousemove = dragMap //move map
 
-    function dragMap(e) { ///moves map with mouse
+    function dragMap(e) {
+      ///moves map with mouse
       mapContainer.scrollLeft = startpos.left - (e.clientX - startpos.x)
       mapContainer.scrollTop = startpos.top - (e.clientY - startpos.y)
     }
 
     function closeDragMap() {
       //stop moving when mouse button is released:
-      document.onmouseup = null;
-      document.onmousemove = null;
+      document.onmouseup = null
+      document.onmousemove = null
 
-      if(mapZoom == 1) mapContainer.style.cursor = 'default' //cursor reset if map is not zoomed in
-      else mapContainer.style.cursor = 'grab'; //since image is zoomed in user should know its movable
+      if (mapZoom == 1) mapContainer.style.cursor = "default"
+      //cursor reset if map is not zoomed in
+      else mapContainer.style.cursor = "grab" //since image is zoomed in user should know its movable
 
-      mapContainer.style.removeProperty('user-select');
+      mapContainer.style.removeProperty("user-select")
     }
   }
 }
@@ -459,11 +481,11 @@ function mapMouseDown(e) {
 //creates new map marker
 function addMapMarker() {
   mapMarkers.push({
-    "top": 20,
-    "left": 30,
-    "name": "new Marker",
-    "type": 0, //heading, label or pinpoint
-    "linksTo": null
+    top: 20,
+    left: 30,
+    name: "new Marker",
+    type: 0, //heading, label or pinpoint
+    linksTo: null,
   })
 
   reloadMarker() //displays addet marker
@@ -477,44 +499,47 @@ function addMapMarker() {
 function reloadMarker() {
   let allMarkers = mapContainer.querySelectorAll(".marker")
 
-  allMarkers.forEach(elem => {//deletes all old markers (cant just overwrite html since its the same div as other important stuff)
+  allMarkers.forEach((elem) => {
+    //deletes all old markers (cant just overwrite html since its the same div as other important stuff)
     elem.remove()
-  });
+  })
 
   for (let i = 0; i < mapMarkers.length; i++) {
     let newMarker = document.createElement("div")
-      newMarker.classList.add("marker")
-      if (editmode == 0) { newMarker.classList.add("cursor-move") } //only displayes move icon if "editmode" is set to edit
-      newMarker.style.top = mapMarkers[i].top + "vw"
-      newMarker.style.left = mapMarkers[i].left + "vw"
-      newMarker.setAttribute("onmousedown", `moveMarker(this, ${i})`)
-      newMarker.setAttribute("onmouseenter", `hoverMarker(this)`)
-      newMarker.setAttribute("data-id", i)
+    newMarker.classList.add("marker")
+    if (editmode == 0) {
+      newMarker.classList.add("cursor-move")
+    } //only displayes move icon if "editmode" is set to edit
+    newMarker.style.top = mapMarkers[i].top + "vw"
+    newMarker.style.left = mapMarkers[i].left + "vw"
+    newMarker.setAttribute("onmousedown", `moveMarker(this, ${i})`)
+    newMarker.setAttribute("onmouseenter", `hoverMarker(this)`)
+    newMarker.setAttribute("data-id", i)
 
     let markerIcon = document.createElement("div")
-      markerIcon.classList.add("icon")
+    markerIcon.classList.add("icon")
 
     //styles the different types of markers as they should
     switch (parseInt(mapMarkers[i].type)) {
       case 0:
         newMarker.classList.add("heading")
-        break;
+        break
       case 1:
         newMarker.classList.add("label")
         markerIcon.innerHTML = "&#9660;"
-        break;
+        break
       case 2:
         newMarker.classList.add("pinpoint")
         markerIcon.innerHTML = "&#9670;"
-        break;
+        break
     }
 
     //relativ elem to center markername propperly(no absolute relativ elem)
     let container = document.createElement("div")
-      container.classList.add("relative")
+    container.classList.add("relative")
 
     let markerName = document.createElement("p")
-      markerName.innerText = mapMarkers[i].name
+    markerName.innerText = mapMarkers[i].name
 
     container.appendChild(markerName)
     newMarker.appendChild(container)
@@ -524,36 +549,43 @@ function reloadMarker() {
 }
 
 function clickMarker(elem) {
-  console.log("clicked marker");
+  console.log("clicked marker")
   loadWiki()
 }
 
 let hoveredMarker = null
 
 function hoverMarker(elem) {
-  if (draggingMarker == false && editmode == 0) {//if user is not already moving marker and editmode is set to edit
+  if (draggingMarker == false && editmode == 0) {
+    //if user is not already moving marker and editmode is set to edit
     ///displayes edit symbol next to marker
-    if (parseInt(mapMarkers[elem.dataset.id].type) == 0) {//marker type heading
-      markerEditButton.style.top = parseFloat(elem.style.top) - .4 + "vw"
-      markerEditButton.style.left = parseFloat(elem.style.left) - pxToVw(elem.querySelector("p").clientWidth / 2) - 1 + "vw"
-      markerEditButton.style.width = pxToVw(elem.querySelector("p").clientWidth) + 3 + "vw"
-      markerEditButton.style.height = pxToVw(parseFloat(elem.querySelector("p").clientHeight)) + 1 + "vw"
+    if (parseInt(mapMarkers[elem.dataset.id].type) == 0) {
+      //marker type heading
+      markerEditButton.style.top = parseFloat(elem.style.top) - 0.4 + "vw"
+      markerEditButton.style.left =
+        parseFloat(elem.style.left) -
+        pxToVw(elem.querySelector("p").clientWidth / 2) -
+        1 +
+        "vw"
+      markerEditButton.style.width =
+        pxToVw(elem.querySelector("p").clientWidth) + 3 + "vw"
+      markerEditButton.style.height =
+        pxToVw(parseFloat(elem.querySelector("p").clientHeight)) + 1 + "vw"
       //? fix hover end in direction of text
-    }
-    else if (parseInt(mapMarkers[elem.dataset.id].type) == 1) {//marker type label
+    } else if (parseInt(mapMarkers[elem.dataset.id].type) == 1) {
+      //marker type label
       markerEditButton.style.top = parseFloat(elem.style.top) - 0.3 + "vw"
       markerEditButton.style.left = parseFloat(elem.style.left) - 1 + "vw"
-    }
-    else {//marker type pinpoint
-      markerEditButton.style.top = parseFloat(elem.style.top) - .5 + "vw"
+    } else {
+      //marker type pinpoint
+      markerEditButton.style.top = parseFloat(elem.style.top) - 0.5 + "vw"
       markerEditButton.style.left = parseFloat(elem.style.left) - 1 + "vw"
     }
 
     markerEditButton.style.display = "flex"
 
     hoveredMarker = elem ///saves marker that is currently hovered
-  }
-  else {
+  } else {
     closeMarkerHover()
   }
 }
@@ -570,51 +602,53 @@ let editing = false
 function editMarker() {
   if (hoveredMarker == null) return //unlikely event that edit is called before marker was hovered
 
-  if (editing == false) {//toggel
+  if (editing == false) {
+    //toggel
     editing = true
     editingMarker = hoveredMarker
-    
+
     markerEditor.style.left = "-1rem" //shows marker editor
-    
+
     let id = parseInt(editingMarker.dataset.id)
-    
+
     //highlights marker that is beeing edited
-    editingMarker.querySelector(".icon").style.color = "var(--marker-edit-color)"
-    editingMarker.querySelector("p").style.textShadow = "var(--shadow-markers-edit)"
+    editingMarker.querySelector(".icon").style.color =
+      "var(--marker-edit-color)"
+    editingMarker.querySelector("p").style.textShadow =
+      "var(--shadow-markers-edit)"
 
     //fills out input fields with data of selected marker
     markerEditor.querySelector(".marker-name").value = mapMarkers[id].name
     markerEditor.querySelector(".marker-type").value = mapMarkers[id].type
     markerEditor.querySelector(".marker-link").value = mapMarkers[id].linksTo
-
-  }
-  else {
+  } else {
     closeMarkerEdit()
   }
 }
 
 function saveMarkerEdits() {
-  console.log("saving");
+  console.log("saving")
   let id = parseInt(editingMarker.dataset.id)
 
   mapMarkers[id].name = markerEditor.querySelector(".marker-name").value
   mapMarkers[id].type = markerEditor.querySelector(".marker-type").value
   mapMarkers[id].linksTo = markerEditor.querySelector(".marker-link").value
 
-  saveMarkers()//sends markerdata to server
+  saveMarkers() //sends markerdata to server
 
   closeMarkerEdit()
 
-  reloadMarker()//displays changes
+  reloadMarker() //displays changes
 }
 
 function closeMarkerEdit() {
-  console.log("closing");
+  console.log("closing")
   editing = false
 
   //resets marker highlighting
   editingMarker.querySelector(".icon").style.color = "rgb(85, 72, 56)"
-  editingMarker.querySelector("p").style.textShadow = "var(--shadow-markers-text), var(--shadow-markers-text), var(--shadow-markers-text)"
+  editingMarker.querySelector("p").style.textShadow =
+    "var(--shadow-markers-text), var(--shadow-markers-text), var(--shadow-markers-text)"
 
   markerEditor.style.left = "-100%" //hides editor
 }
@@ -627,10 +661,11 @@ let draggingMarker = false
 let dragStartTime = Date.now()
 
 function moveMarker(elem, id, e) {
-  e = e || window.event;
+  e = e || window.event
 
-  if (e.target.closest('.marker') != null && editmode == 0) {//if user clicked marker and editmode is edit
-    e.preventDefault();
+  if (e.target.closest(".marker") != null && editmode == 0) {
+    //if user clicked marker and editmode is edit
+    e.preventDefault()
 
     dragStartTime = Date.now() //saves time when user clicked
 
@@ -647,13 +682,15 @@ function moveMarker(elem, id, e) {
     closeMarkerHover()
 
     function dragMarker(e) {
-      e = e || window.event;
-      e.preventDefault();
+      e = e || window.event
+      e.preventDefault()
 
       mapMarkers[id].top = pxToVw(
-        Math.min(//prevents marker moving out the bottom
+        Math.min(
+          //prevents marker moving out the bottom
           mapContainer.clientHeight - elem.clientHeight,
-          Math.max(//prevents marker moving out the top
+          Math.max(
+            //prevents marker moving out the top
             elem.clientHeight,
             e.clientY - startpos.y + startpos.top
           )
@@ -661,9 +698,11 @@ function moveMarker(elem, id, e) {
       )
 
       mapMarkers[id].left = pxToVw(
-        Math.min(//prevents marker moving out the right
+        Math.min(
+          //prevents marker moving out the right
           mapContainer.clientWidth - elem.clientWidth / 2,
-          Math.max(//prevents marker moving out the left
+          Math.max(
+            //prevents marker moving out the left
             elem.clientWidth / 2,
             e.clientX - startpos.x + startpos.left
           )
@@ -671,23 +710,28 @@ function moveMarker(elem, id, e) {
       )
 
       elem.style.top = mapMarkers[id].top + "vw"
-      elem.style.left = mapMarkers[id].left  + "vw"
+      elem.style.left = mapMarkers[id].left + "vw"
 
       contentEdited()
     }
 
     function closeDragMarker(e) {
-      document.onmouseup = null;
-      document.onmousemove = null;
+      document.onmouseup = null
+      document.onmousemove = null
       draggingMarker = false
 
       //if mouse was moved more than 6 pixel or held down for more than 300ms
-      if (Math.abs(startpos.x - e.clientX) > 6 && Math.abs(startpos.y - e.clientY) > 6 || Date.now() - dragStartTime > 300) { ///hovering marker
+      if (
+        (Math.abs(startpos.x - e.clientX) > 6 &&
+          Math.abs(startpos.y - e.clientY) > 6) ||
+        Date.now() - dragStartTime > 300
+      ) {
+        ///hovering marker
         hoverMarker(elem)
 
         saveMarkers()
-      }
-      else {///clicking marker
+      } else {
+        ///clicking marker
         //resets marker in case it was moved
         elem.style.top = pxToVw(startpos.top) + "vw"
         elem.style.left = pxToVw(startpos.left) + "vw"
@@ -710,73 +754,94 @@ function openFileUpload() {
 
 //reads selected image and converts to string
 mapInput.addEventListener("change", function () {
-  const reader = new FileReader();
+  const reader = new FileReader()
 
   reader.addEventListener("load", () => {
-    const uploadedImage = reader.result;
+    const uploadedImage = reader.result
 
-    mapImage.style.backgroundImage = `url(${uploadedImage})`;
+    mapImage.style.backgroundImage = `url(${uploadedImage})`
     noMapImageButton.style.display = "none"
     mapImage.style.display = "block"
     mapControls.style.opacity = 1
 
     //reads size of string encodet image
-    var i = new Image();
+    var i = new Image()
     i.onload = function () {
       mapImage.style.aspectRatio = i.width + " / " + i.height //making zooming or overflow cool or smth idk anymore
-    };
-    i.src = uploadedImage;
+    }
+    i.src = uploadedImage
 
     window.electronAPI.setMapImage(uploadedImage)
     contentEdited()
-  });
-  reader.readAsDataURL(this.files[0]);
-});
+  })
+  reader.readAsDataURL(this.files[0])
+})
 //#endregion
 
 //---------- WIKI ----------//
-//#region 
+//#region
 
-function reloadWikiEntries(){
+function reloadWikiEntries() {
   let html = ""
   for (let i = 0; i < wikiEntries.length; i++) {
-    html += `<li>${wikiEntries[i].name}</li>`
+    html += `<li onclick="swapEntry('${wikiEntries[i].uuid}')">${wikiEntries[i].name}</li>`
   }
   asideContent.innerHTML = html
 }
 
-function addEntry(){
-  popup(0, {submit: 'window.electronAPI.addEntry(document.querySelector("#popup .content input").value)'})
+function addEntry() {
+  popup(0, {
+    submit:
+      'window.electronAPI.addEntry(document.querySelector("#popup .content input").value)',
+  })
 }
 
-function saveEntry() {//gets data from editor
-  editor.save().then((outputData) => {
-    console.log('saving wiki - entry data: ', outputData)
+//called when entry is clicked 
+//!fix thingy where data isnt saved propperly when only strg s not swaping (edit strng s home enter - works when edit strgs relode enter)
+function swapEntry(to) {
+  if(to != currentEntry || to == "save"){ //must be new entry or call is from the save function
+    //gets data from editor
+    editor
+      .save()
+      .then((outputData) => {
+        if(currentEntry != undefined){
+          console.log("saving wiki - entry data: ", outputData)
 
-    let data = JSON.stringify(outputData)
-
-    window.electronAPI.saveEntry(data, 0)
-
-  }).catch((error) => {
-    console.error('Saving failed: ', error)
-    alert("ERROR: saving failed: \n", error)
-    contentSaved = false
-  });
+          window.electronAPI.saveEntry(JSON.stringify(outputData), currentEntry)
+        }
+      })
+      .then(() => {
+        if(to != "save"){
+          window.electronAPI.selectEntry(to)
+        }
+        else{
+          console.log("save");
+        }
+      })
+      .catch((error) => {
+        console.error("Saving failed: ", error)
+        alert("ERROR: saving failed: \n", error)
+        contentSaved = false
+      })
+  }
 }
 
 function toggleAside() {
-  if (asideVisible == false) { ///close -> open
+  if (asideVisible == false) {
+    ///close -> open
     asideVisible = true
     openClose.style.transform = ""
     openClose.style.border = ".5rem solid transparent;"
     aside.querySelector(".content").style.display = "block"
-    aside.style.paddingRight = "0rem"
-  }
-  else { ///open -> close
+    aside.querySelector("#add-entry").style.display = "block"
+    aside.style.paddingRight = ".7rem"
+  } else {
+    ///open -> close
     asideVisible = false
     openClose.style.transform = "scaleX(1)"
     openClose.style.border = "1rem solid transparent;"
     aside.querySelector(".content").style.display = "none"
+    aside.querySelector("#add-entry").style.display = "none"
     aside.style.paddingRight = "1rem"
   }
 }
@@ -812,12 +877,12 @@ function initEditor() {
       },
       quote: Quote,
     },
-  });
+  })
 }
 //#endregion
 
 //---------- KEY LISTENERS ----------//
-//#region 
+//#region
 let mDown = false
 let wDown = false
 let tDown = false
@@ -890,14 +955,14 @@ setInterval(() => {
     toggleAside()
   }
 
-  if (editing == true) {//editing marker
+  if (editing == true) {
+    //editing marker
     if (enterDown == true) {
       saveMarkerEdits()
-      console.log("enterdown");
-    }
-    else if (escapeDown == true) {
+      console.log("enterdown")
+    } else if (escapeDown == true) {
       closeMarkerEdit()
-      console.log("escapedown");
+      console.log("escapedown")
     }
   }
 }, 100)

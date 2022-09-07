@@ -1,5 +1,5 @@
 /************ Generall ************/
-*{
+* {
     margin: 0;
     padding: 0;
     font-family: sans-serif;
@@ -11,25 +11,28 @@
     color: rgb(75, 73, 68) !important;
 }
 
-input[type=text]:focus{
+input[type=text]:focus {
     outline: 2px solid var(--color-accent);
 }
 
-option:hover{
+option:hover {
     background-color: var(--color-accent);
 }
 
-img{
-    width:100%
+img {
+    width: 100%
 }
 
 /************ Main Style ************/
-body{
+
+/* #region */
+
+body {
     background-color: #8d785f;
     overflow-x: hidden;
 }
 
-#global-cursor{
+#global-cursor {
     position: absolute;
     width: 100vw;
     height: 100vh;
@@ -38,7 +41,7 @@ body{
     z-index: 1000;
 }
 
-.extern-nav-button{
+.extern-nav-button {
     position: absolute;
     top: 0;
     background-color: var(--nav-background);
@@ -52,31 +55,35 @@ body{
     place-content: center;
 }
 
-#home-button{
+#home-button {
     border-bottom-right-radius: 1rem;
     left: 0;
 }
 
-#home-button:hover{
+#home-button:hover {
     transform: scale(1.05);
 }
 
-#save-button{
+#save-button {
     border-bottom-left-radius: 1rem;
     right: 0;
 }
 
-#save-button:hover{
+#save-button:hover {
     transform: scale(1.05);
 }
 
-#save-button .save{
+#save-button .save {
     display: none;
 }
 
+/* #endregion */
+
 /*---------- popup ----------*/
 
-#popup{
+/* #region */
+
+#popup {
     display: none;
     position: absolute;
     background-color: rgba(0, 0, 0, 0.4);
@@ -86,7 +93,7 @@ body{
     top: 0;
 }
 
-#popup .content{
+#popup .content {
     position: absolute;
     top: 50vh;
     left: 50vw;
@@ -97,13 +104,13 @@ body{
     box-shadow: var(--shadow-1);
 }
 
-#popup .buttons{
+#popup .buttons {
     display: flex;
     justify-content: space-evenly;
     margin-top: .5rem;
 }
 
-#popup .buttons p{
+#popup .buttons p {
     padding: .3rem .6rem;
     border-radius: .3rem;
     background-color: rgb(116, 99, 80);
@@ -112,7 +119,7 @@ body{
     cursor: pointer;
 }
 
-#popup input{
+#popup input {
     padding: .3rem;
     background-color: rgb(116, 99, 80);
     border: none;
@@ -120,15 +127,17 @@ body{
     border-radius: .3rem;
 }
 
-#popup input::placeholder{
+#popup input::placeholder {
     color: rgb(161, 153, 125);
 }
+
+/* #endregion */
 
 /*---------- homescreen ----------*/
 
 /* #region */
 
-#home{
+#home {
     position: absolute;
     /* left: 50%;
     transform: translateX(-50%); */
@@ -140,7 +149,7 @@ body{
     z-index: 500;
 }
 
-#home h1{
+#home h1 {
     text-align: center;
     margin-bottom: 1rem;
     font-size: 1.6rem;
@@ -148,7 +157,7 @@ body{
     color: var(--text-accent);
 }
 
-#world-list{
+#world-list {
     background-color: var(--nav-background);
     border-radius: .5rem;
     width: 30vw;
@@ -158,19 +167,19 @@ body{
     /* box-shadow: var(--shadow-0); */
 }
 
-#world-list .text{
+#world-list .text {
     text-align: center;
     color: rgb(211, 197, 167);
     /* background-color: rgb(130, 112, 91); */
 }
 
-#world-list .empty{
+#world-list .empty {
     color: rgb(185, 173, 145);
     padding: .5rem;
     text-align: center;
 }
 
-#world-list div{
+#world-list div {
     padding: .1rem;
     margin-bottom: .3rem;
     transition: all .2s;
@@ -179,15 +188,16 @@ body{
     cursor: pointer;
 }
 
-#world-list div:hover{
+#world-list div:hover {
     background-color: rgb(130, 112, 91);
 }
+
 /* 
 #world-list div:hover .delete{
     display: block;
 } */
 
-#world-list .delete{
+#world-list .delete {
     position: absolute;
     right: .5rem;
     top: 40%;
@@ -197,18 +207,18 @@ body{
     color: var(--text-accent);
 }
 
-#world-list .delete:hover{
+#world-list .delete:hover {
     color: var(--color-alert);
 }
 
-#new-world{
+#new-world {
     margin-top: 10vh;
     position: relative;
     height: 10vh;
     width: 40vw;
 }
 
-#new-world .button{
+#new-world .button {
     position: absolute;
     top: 0;
     left: 50%;
@@ -226,11 +236,11 @@ body{
     z-index: 520;
 }
 
-#new-world .button:hover{
+#new-world .button:hover {
     padding: .55rem 2.7rem;
 }
 
-#new-world .error{
+#new-world .error {
     color: var(--color-alert);
     position: absolute;
     top: -1.5rem;
@@ -242,7 +252,7 @@ body{
     font-weight: bold;
 }
 
-#new-world .name{
+#new-world .name {
     display: flex;
     position: absolute;
     left: 50%;
@@ -253,7 +263,7 @@ body{
     z-index: 510;
 }
 
-#new-world .name input{
+#new-world .name input {
     padding: .55rem 2.7rem;
     background-color: var(--nav-background);
     color: var(--text-background);
@@ -264,11 +274,11 @@ body{
     border-radius: .5rem;
 }
 
-#new-world .name input::placeholder{
+#new-world .name input::placeholder {
     color: var(--text-accent);
 }
 
-#new-world .name .info-icon{
+#new-world .name .info-icon {
     font-size: 1.4rem;
     cursor: pointer;
     position: absolute;
@@ -276,7 +286,7 @@ body{
     color: rgb(209, 194, 167);
 }
 
-#new-world .name .info{
+#new-world .name .info {
     position: absolute;
     left: 115%;
     background-color: rgb(209, 196, 173);
@@ -289,11 +299,11 @@ body{
     box-shadow: var(--shadow-1);
 }
 
-#new-world .name .info-icon:hover + .info{
+#new-world .name .info-icon:hover+.info {
     display: block;
 }
 
-#new-world .close{
+#new-world .close {
     position: absolute;
     top: -1rem;
     right: 0;
@@ -309,7 +319,8 @@ body{
 /*---------- map ----------*/
 
 /* #region */
-#map{
+
+#map {
     width: 100vw;
     height: 100vh;
     transition: left .5s;
@@ -320,7 +331,7 @@ body{
     box-sizing: border-box;
 }
 
-#map-controls{
+#map-controls {
     background-color: var(--text-background);
     height: 2rem;
     border-top-left-radius: 1rem;
@@ -337,33 +348,33 @@ body{
     color: rgb(107, 100, 83);
 }
 
-#map-controls div{
+#map-controls div {
     display: flex;
 }
 
-#map-controls > p{
+#map-controls>p {
     color: inherit;
     cursor: pointer;
     transition: color .3s;
 }
 
-#map-controls > p:hover{
+#map-controls>p:hover {
     color: rgb(54, 49, 33);
 }
 
-#map-controls #zoom-slider{
+#map-controls #zoom-slider {
     width: 15vw;
 }
 
-#map-image{
+#map-image {
     width: inherit;
     display: none;
-    background-size:contain;
+    background-size: contain;
     background-repeat: no-repeat;
-    background-position:top;
+    background-position: top;
 }
 
-#map-container{
+#map-container {
     width: 70vw;
     height: 80vh;
     overflow: scroll;
@@ -371,11 +382,11 @@ body{
     margin-inline: auto;
 }
 
-#map-container::-webkit-scrollbar{
+#map-container::-webkit-scrollbar {
     display: none;
 }
 
-#map .marker{
+#map .marker {
     width: 1vw;
     height: 1vw;
     position: absolute;
@@ -385,11 +396,11 @@ body{
     transform: translate(-50%, -100%);
 }
 
-#map .marker.cursor-move{
+#map .marker.cursor-move {
     cursor: move;
 }
 
-#map .marker p{
+#map .marker p {
     position: absolute;
     overflow: visible;
     text-align: center;
@@ -399,11 +410,11 @@ body{
     user-select: none;
 }
 
-#map .marker .relative{
+#map .marker .relative {
     position: relative;
 }
 
-#map .marker .icon{
+#map .marker .icon {
     width: 1vw;
     height: 1vw;
     font-size: 1.1vw;
@@ -415,23 +426,23 @@ body{
     background-clip: border-box;
 }
 
-#map .marker.heading p{
+#map .marker.heading p {
     font-size: 1.2rem;
-    font-family:'Times New Roman', Times, serif;
+    font-family: 'Times New Roman', Times, serif;
     text-transform: uppercase;
     margin-bottom: -.3rem;
     text-shadow: var(--shadow-markers-text), var(--shadow-markers-text), var(--shadow-markers-text);
 }
 
-#map .marker.label p{
-    font-family:'Times New Roman', Times, serif;
+#map .marker.label p {
+    font-family: 'Times New Roman', Times, serif;
     pointer-events: none;
     bottom: 100%;
     text-shadow: var(--shadow-markers-text), var(--shadow-markers-text), var(--shadow-markers-text);
 }
 
-#map .marker.pinpoint p{
-    font-family:'Times New Roman', Times, serif;
+#map .marker.pinpoint p {
+    font-family: 'Times New Roman', Times, serif;
     pointer-events: none;
     opacity: 0;
     bottom: 100%;
@@ -439,20 +450,20 @@ body{
     transition: opacity .2s;
 }
 
-#map .marker.pinpoint:hover p{
+#map .marker.pinpoint:hover p {
     opacity: 1;
 }
 
-#map .marker.pinpoint{
+#map .marker.pinpoint {
     border: .2vw solid transparent;
     border-radius: 50%
 }
 
-#map .marker.pinpoint .icon{
+#map .marker.pinpoint .icon {
     font-size: .9vw;
 }
 
-#marker-edit-button{
+#marker-edit-button {
     width: 3vw;
     height: 4vh;
     position: absolute;
@@ -467,7 +478,7 @@ body{
     transform: translateY(-50%);
 }
 
-#marker-edit-button .editbutton{
+#marker-edit-button .editbutton {
     width: 1vw;
     right: .5vw;
     cursor: pointer;
@@ -478,11 +489,11 @@ body{
     text-shadow: var(--shadow-markers-icon);
 }
 
-#map-image-input{
+#map-image-input {
     display: none;
 }
 
-#map-marker-editor{
+#map-marker-editor {
     position: absolute;
     left: -100%;
     top: 50%;
@@ -497,24 +508,26 @@ body{
     transition: left .5s;
 }
 
-#map-marker-editor label{
+#map-marker-editor label {
     margin-top: 1rem;
 }
 
-#map-marker-editor input, #map-marker-editor select{
+#map-marker-editor input,
+#map-marker-editor select {
     margin-top: 1rem;
     background-color: rgb(207, 190, 158);
     border: none;
     padding: .3rem;
 }
 
-#map-marker-editor input:focus, #map-marker-editor select:focus{ 
+#map-marker-editor input:focus,
+#map-marker-editor select:focus {
     background-color: rgb(190, 174, 144);
     border: none;
     outline: none;
 }
 
-#map-marker-editor .save{
+#map-marker-editor .save {
     margin-top: 1rem;
     padding: .3rem .5rem;
     background-color: rgb(207, 190, 158);
@@ -525,11 +538,11 @@ body{
     margin-inline: auto;
 }
 
-#map-marker-editor .save:hover{
+#map-marker-editor .save:hover {
     background-color: rgb(190, 174, 144);
 }
 
-#map-marker-editor .close{
+#map-marker-editor .close {
     position: absolute;
     top: .2rem;
     right: .2rem;
@@ -541,11 +554,11 @@ body{
     transform: all .3s;
 }
 
-#map-marker-editor .close:hover{
+#map-marker-editor .close:hover {
     font-size: 1.05rem;
 }
 
-#no-map-image-button{
+#no-map-image-button {
     background-color: var(--text-accent);
     padding: 1rem;
     border-radius: 1rem;
@@ -562,16 +575,17 @@ body{
     z-index: 50;
 }
 
-#no-map-image-button:hover{
+#no-map-image-button:hover {
     background-color: rgb(177, 165, 137);
 }
+
 /* #endregion */
 
 /*---------- wiki ----------*/
 
 /* #region */
 
-#wiki{
+#wiki {
     width: 100%;
     transition: left .5s;
     position: absolute;
@@ -584,70 +598,97 @@ body{
     box-sizing: border-box;
 }
 
-#editjs{
+#entry-name{
+    max-width: calc(650px + 16rem);
+    box-sizing: border-box;
+    background-color: var(--text-background);
+    margin-inline: auto;
+    display: block;
+    border-top-left-radius: 1rem;
+    border-top-right-radius: 1rem;
+    padding: .5rem;
+    display: flex;
+    justify-content: center;
+}
+
+#entry-name input{
+    background-color: transparent;
+    border: none;
+    font-size: 1.8rem;
+    margin-left: 1rem;
+    padding: .5rem;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-weight: lighter;
+    color: var(--nav-background);
+    text-align: center;
+}
+
+#editjs {
     font-family: sans-serif;
     color: var(--color-contrast);
 }
 
-#editjs .codex-editor{
+#editjs .codex-editor {
     max-width: calc(650px + 16rem);
     margin-inline: auto;
     padding-block: 1rem;
     background-color: var(--text-background);
-    border-radius: 1rem;
-    box-shadow: var(--shadow-1);
+    border-bottom-left-radius: 1rem;
+    border-bottom-right-radius: 1rem;
+    box-shadow: 0rem .5rem .5rem 0rem rgba(0, 0, 0, 0.4);
 }
 
-#editjs .codex-editor__redactor{
-     margin-right: 0 !important;
-     padding-bottom: 0 !important;
+#editjs .codex-editor__redactor {
+    margin-right: 0 !important;
+    padding-bottom: 0 !important;
 }
 
-#editjs .codex-editor__redactor .ce-block{
-    padding-inline: 8rem;   
+#editjs .codex-editor__redactor .ce-block {
+    padding-inline: 8rem;
 }
 
-#wiki aside{
+#wiki aside {
     position: absolute;
     left: -1vw;
-    background-color: var(--edit-color) ;
+    background-color: var(--edit-color);
     border-radius: 1rem;
     min-width: 1rem;
     min-height: .7rem;
     z-index: 100;
     box-shadow: var(--shadow-1);
     transition: all .15s;
-    padding-block: .5rem;
-    padding-left: 1.3vw;
+    padding: .7rem;
+    padding-left: 1.4vw;
 }
 
-#wiki aside ul{
-    padding-left: 1rem;
-    padding-right: 2rem;
-    padding-block: .5rem;
-}
-
-#wiki aside h1{
+#wiki aside h1 {
     font-size: 1.1rem;
     font-weight: bold;
     color: rgb(68, 62, 47);
     width: 100%;
 }
 
-#wiki aside ul li{
+#wiki aside ul li {
     margin-left: 1.5rem;
     color: rgb(57, 53, 44);
+    transition: all .2s;
+    margin-right: .5rem;
+    cursor: pointer;
+    user-select: none;
+    padding-block: .3rem;
 }
 
-#wiki aside ul li::marker{
+#wiki aside ul li::marker {
     color: rgb(124, 117, 97);
 }
 
-#wiki aside #add-category{
-
+#wiki aside ul li:hover {
+    color: rgb(105, 84, 33);
+    margin-left: 1.8rem;
+    margin-right: .2rem;
 }
 
-#wiki aside #add-entry{
+#wiki aside #add-entry {
     font-weight: bold;
     font-size: 1.3rem;
     height: 1.3rem;
@@ -655,30 +696,47 @@ body{
     border-radius: .3rem;
     background-color: rgb(194, 179, 155);
     cursor: pointer;
+    margin-top: 1rem;
+    padding-bottom: .15rem;
+    transition: all .2s;
+    box-shadow: var(--shadow-0);
+    width: 100%;
 }
 
-#wiki aside #open-close{
+#wiki aside #add-entry:hover{
+    background-color: rgb(180, 164, 138);
+}
+
+#wiki aside #open-close {
     position: absolute;
     right: 0;
-    top: -.5rem;
+    top: -.35rem;
     color: rgb(124, 117, 97);
     border: .5rem solid transparent;
     cursor: pointer;
     border-radius: 50%;
-    transition: all .4s;
+    border-bottom: none;
+    transition: all .2s;
     font-size: 1.2rem;
     transform: scaleX(-1);
 }
 
-#wiki aside #open-close:hover{
+#wiki aside #open-close:hover {
     color: rgb(79, 75, 62);
-    font-size: 1.25rem;
 }
+
+#wiki aside .content{
+    min-width: 6vw;
+    margin-top: 1.5rem;
+}
+
 /* #endregion */
 
-/*---------- nav ----------*/ 
+/*---------- nav ----------*/
+
 /* #region */
-nav{
+
+nav {
     background-color: var(--nav-background);
     height: 2.5rem;
     border-bottom-left-radius: 2rem;
@@ -695,13 +753,16 @@ nav{
     z-index: 200;
 }
 
-nav #save-info, nav #worldname{
+nav #save-info,
+nav #worldname {
     margin-inline: 4rem;
-    color: /* rgb(190, 180, 150) */ var(--text-accent);
+    color:
+        /* rgb(190, 180, 150) */
+        var(--text-accent);
     font-size: 1rem;
 }
 
-#worldname{
+#worldname {
     background-color: transparent;
     border: none;
     /* border-bottom: .1rem solid rgb(209, 198, 167); */
@@ -711,19 +772,21 @@ nav #save-info, nav #worldname{
     transition: color .2s;
 }
 
-#worldname:focus{
+#worldname:focus {
     outline: none;
     border-bottom: .1rem solid rgb(167, 158, 134);
     background-color: rgb(130, 112, 91);
 }
 
-#worldname:hover{
+#worldname:hover {
     color: var(--nav-accent);
 }
 
-#worldname::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+#worldname::placeholder {
+    /* Chrome, Firefox, Opera, Safari 10.1+ */
     color: rgb(184, 162, 137);
-    opacity: 1; /* Firefox */
+    opacity: 1;
+    /* Firefox */
 }
 
 /* #worldname::before{
@@ -734,7 +797,7 @@ nav #save-info, nav #worldname{
     color:var(--nav-accent);
 } */
 
-nav ul{
+nav ul {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -745,21 +808,28 @@ nav ul{
     top: 0;
 }
 
-nav ul li{
-    margin-inline: 1rem;
+nav ul li {
+    padding-inline: 1rem;
     width: 50%;
     z-index: 30;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-nav ul li:first-of-type p{
+nav ul li:first-of-type p {
     margin-left: auto;
+    text-align: center;
+    vertical-align: middle;
+    height: fit-content;
 }
 
-nav ul li:last-of-type p{
+nav ul li:last-of-type p {
     margin-right: auto;
 }
 
-nav ul li p{
+nav ul li p {
     text-shadow: 1px 1px 0 var(--nav-background), 1px -1px 0 var(--nav-background), -1px 1px 0 var(--nav-background), -1px -1px 0 var(--nav-background), 1px 0px 0 var(--nav-background), 0px 1px 0 var(--nav-background), -1px 0px 0 var(--nav-background), 0px -1px 0 var(--nav-background);
     font-size: 1.25rem;
     width: fit-content;
@@ -768,15 +838,15 @@ nav ul li p{
     user-select: none;
 }
 
-nav ul li p:hover{
+nav ul li:hover p {
     color: var(--nav-hover) !important;
 }
 
-nav ul li::marker{
+nav ul li::marker {
     content: "";
 }
 
-#nav-marker{
+#nav-marker {
     position: absolute;
     background-color: var(--nav-accent);
     width: 3rem;
@@ -790,12 +860,14 @@ nav ul li::marker{
     z-index: 20;
 }
 
-#toggel-editmode{
+#toggel-editmode {
     height: 1.1rem;
     overflow: hidden;
     width: 10vw;
     margin-inline: 4rem;
-    color: /* rgb(190, 180, 150) */ var(--text-accent);
+    color:
+        /* rgb(190, 180, 150) */
+        var(--text-accent);
     position: relative;
     font-size: 1rem;
     box-sizing: border-box;
@@ -803,39 +875,40 @@ nav ul li::marker{
     transition: color .3s;
 }
 
-#toggel-editmode p{
+#toggel-editmode p {
     position: absolute;
     right: 0;
     transition: top .5s;
 }
 
-#toggel-editmode p:first-of-type{
+#toggel-editmode p:first-of-type {
     top: 0;
 }
 
-#toggel-editmode p:last-of-type{
+#toggel-editmode p:last-of-type {
     top: 100%;
 }
 
-#toggel-editmode:hover{
+#toggel-editmode:hover {
     color: rgb(211, 200, 169);
 }
 
 /* #endregion */
 
 /************ EditorJs ************/
+
 /* #region */
 
-::selection{
+::selection {
     background-color: rgb(200, 200, 178);
 }
 
-.cdx-nested-list__item:first-of-type{
+.cdx-nested-list__item:first-of-type {
     margin-top: 0;
     padding-top: 1px;
 }
 
-.cdx-nested-list__item:last-of-type{
+.cdx-nested-list__item:last-of-type {
     margin-bottom: 0;
     padding-bottom: 1px;
 }
@@ -843,20 +916,22 @@ nav ul li::marker{
 /*---------- Table Fixes ----------*/
 
 
-.tc-wrap{ /* recoulors tabel */
+.tc-wrap {
+    /* recoulors tabel */
     --color-border: rgb(183, 172, 144) !important;
 }
 
-.tc-cell:first-of-type{ /* adds tabel at beginning */
+.tc-cell:first-of-type {
+    /* adds tabel at beginning */
     border-left: 1px solid var(--color-border);
 }
 
 /* removes lines at the end */
-.tc-add-column{ 
+.tc-add-column {
     border: none !important;
 }
 
-.tc-row::after{
+.tc-row::after {
     border: none !important;
 }
 
@@ -867,35 +942,68 @@ nav ul li::marker{
 /************ Keyframes ************/
 
 @keyframes shake {
-    0% { transform: translate(1px, 1px) rotate(0deg); }
-    10% { transform: translate(-1px, -2px) rotate(-1deg); }
-    20% { transform: translate(-3px, 0px) rotate(1deg); }
-    30% { transform: translate(3px, 2px) rotate(0deg); }
-    40% { transform: translate(1px, -1px) rotate(1deg); }
-    50% { transform: translate(-1px, 2px) rotate(-1deg); }
-    60% { transform: translate(-3px, 1px) rotate(0deg); }
-    70% { transform: translate(3px, 1px) rotate(-1deg); }
-    80% { transform: translate(-1px, -1px) rotate(1deg); }
-    90% { transform: translate(1px, 2px) rotate(0deg); }
-    100% { transform: translate(1px, -2px) rotate(-1deg); }
+    0% {
+        transform: translate(1px, 1px) rotate(0deg);
+    }
+
+    10% {
+        transform: translate(-1px, -2px) rotate(-1deg);
+    }
+
+    20% {
+        transform: translate(-3px, 0px) rotate(1deg);
+    }
+
+    30% {
+        transform: translate(3px, 2px) rotate(0deg);
+    }
+
+    40% {
+        transform: translate(1px, -1px) rotate(1deg);
+    }
+
+    50% {
+        transform: translate(-1px, 2px) rotate(-1deg);
+    }
+
+    60% {
+        transform: translate(-3px, 1px) rotate(0deg);
+    }
+
+    70% {
+        transform: translate(3px, 1px) rotate(-1deg);
+    }
+
+    80% {
+        transform: translate(-1px, -1px) rotate(1deg);
+    }
+
+    90% {
+        transform: translate(1px, 2px) rotate(0deg);
+    }
+
+    100% {
+        transform: translate(1px, -2px) rotate(-1deg);
+    }
 }
 
 /************ Responsive ************/
-@media screen and (min-width: 800px) { /*pc*/
-    main{
-        
-    }
+@media screen and (min-width: 800px) {
+
+    /*pc*/
+    main {}
 }
 
-@media screen and (max-width: 800px) { /*phone*/
-    main{
-        
-    }
+@media screen and (max-width: 800px) {
+
+    /*phone*/
+    main {}
 }
+
 /************ Variables ************/
 :root {
     --text-background: rgb(233, 225, 199);
-    --text-accent:#beb092;
+    --text-accent: #beb092;
     --color-alert: rgb(177, 51, 51);
 
     --nav-background: rgb(122, 104, 83);
@@ -911,23 +1019,25 @@ nav ul li::marker{
 
     --shadow-markers-text: 0rem .5rem .7rem var(--marker-shadow-color), .5rem 0rem .7rem var(--marker-shadow-color), 0rem -.5rem .7rem var(--marker-shadow-color), -.5rem 0rem .7rem var(--marker-shadow-color);
 
-    --shadow-markers-icon: 
-    1px 1px 1px var(--marker-shadow-color), 
-    1px -1px 1px var(--marker-shadow-color),
-    -1px 1px 1px var(--marker-shadow-color),
-    -1px -1px 1px var(--marker-shadow-color),
-    1px 0px 1px var(--marker-shadow-color),
-    0px 1px 1px var(--marker-shadow-color),
-    -1px 0px 1px var(--marker-shadow-color),
-    0px -1px 1px var(--marker-shadow-color);
+    --shadow-markers-icon:
+        1px 1px 1px var(--marker-shadow-color),
+        1px -1px 1px var(--marker-shadow-color),
+        -1px 1px 1px var(--marker-shadow-color),
+        -1px -1px 1px var(--marker-shadow-color),
+        1px 0px 1px var(--marker-shadow-color),
+        0px 1px 1px var(--marker-shadow-color),
+        -1px 0px 1px var(--marker-shadow-color),
+        0px -1px 1px var(--marker-shadow-color);
 
-    --shadow-markers-edit: 
-    0rem .5rem .7rem var(--marker-edit-color), .5rem 0rem .7rem var(--marker-edit-color), 0rem -.5rem .7rem var(--marker-edit-color), -.5rem 0rem .7rem var(--marker-edit-color);
+    --shadow-markers-edit:
+        0rem .5rem .7rem var(--marker-edit-color), .5rem 0rem .7rem var(--marker-edit-color), 0rem -.5rem .7rem var(--marker-edit-color), -.5rem 0rem .7rem var(--marker-edit-color);
 
     --marker-shadow-color: #e7dfc5;
     --marker-edit-color: var(--color-accent);
 
-    --color-accent: /* #2baaff */ #eb9c43;
+    --color-accent:
+        /* #2baaff */
+        #eb9c43;
 
     --edit-color: rgb(212, 205, 183);
     --popup-color-main: rgb(216, 207, 187);
