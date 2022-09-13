@@ -20,6 +20,7 @@
     <script src="./editor/table.js"></script>
 </head>
 <body>
+    <!-- home sectiuon aka world selction -->
     <section id="home">
         <h1>my worlds</h1>
         <div id="world-list"></div>
@@ -38,6 +39,7 @@
         </div>
     </section>
 
+    <!-- NAVIGATION -->
     <div id="home-button" class="extern-nav-button">
         <svg width="2rem" height="2rem" onclick="window.electronAPI.loadHome()">
             <image xlink:href="./icons/home.svg" src="yourfallback.png" width="2rem" height="2rem"/>
@@ -46,7 +48,7 @@
 
     <nav>
         
-        <input id="worldname" placeholder="Worldname" spellcheck="false" onblur="saveWorldName()" onkeydown="contentEdited()">
+        <input id="worldname" placeholder="Worldname" spellcheck="false" onblur="saveWorldName()" onkeydown="contentEdited()" class="lock-on-view">
         
         <ul>
             <li onclick="changeMode(0)"><p>map</p></li>
@@ -74,14 +76,15 @@
         </svg>
     </div>
     
+    <!-- MAP -->
     <section id="map">
         <div id="map-controls">
-            <p onclick="openFileUpload()">swap map image</p>
+            <p onclick="openFileUpload()" class="lock-on-view">swap map image</p>
             <div>
                 <input type="range" min="10" max="30" id="zoom-slider" value="0" oninput="setMapZoom(this.value)">
                 <p id="zoom-value">100%</p>
             </div>
-            <p onclick="addMapMarker()">add marker</p>
+            <p onclick="addMapMarker()" class="lock-on-view">add marker</p>
             <!-- TODO add hide all markers button -->
         </div>
 
@@ -96,7 +99,7 @@
 
         <div id="map-marker-editor">
             <p class="close" onclick="closeMarkerEdit()">&#128473;</p>
-            <svg class="delete" width="1.5rem" height="1.5rem" title="delete marker" onclick="deletemarker()">
+            <svg class="delete" class="lock-on-view" width="1.5rem" height="1.5rem" title="delete marker" onclick="deleteMarker(this)">
                 <image xlink:href="./icons/delete.svg" width="1.5rem" height="1.5rem"/>
             </svg>
 
@@ -116,14 +119,15 @@
 
         <input type="file" id="map-image-input" accept="image/*">
     </section>
-    
+
+    <!-- WIKI -->
     <section id="wiki">
         <aside>
             <p id="open-close" title="toggel tabel of contents" onclick="toggleAside()">&#11166;</p>
 
             <ul class="content"></ul>
 
-            <div id="add-entry" onclick="addEntry()">+</div>
+            <div id="add-entry" class="lock-on-view" onclick="addEntry()">+</div>
 
             <!-- <div id="add-category">new Category</div> -->
         </aside>

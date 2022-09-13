@@ -263,6 +263,10 @@ function toggelEditMode() {
     markerHTML.forEach((elem) => {
       elem.classList.add("cursor-move")
     })
+
+    swapEntry(currentEntry, true)
+
+    /* document.body.classList.remove("viewing") */
   } else if (editmode == 0) {
     //edit to view
     editmode = 1
@@ -272,6 +276,8 @@ function toggelEditMode() {
     markerHTML.forEach((elem) => {
       elem.classList.remove("cursor-move")
     })
+
+    document.body.classList.add("viewing")
   }
 }
 
@@ -712,6 +718,14 @@ function closeMarkerEdit() {
 
 function saveMarkers() {
   window.electronAPI.mapMarkers(JSON.stringify(mapMarkers))
+}
+
+function deleteMarker(elem) {
+  let id = elem.getAttribute(`data-id`)
+  popup(1, {
+    text: 'Confirm deletion of selected marker',
+    confirm:`mapMarkers.splice(${id}, 1); reloadMarker(); closeMarkerEdit(); contentEdited()`
+  })
 }
 
 let draggingMarker = false

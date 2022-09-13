@@ -41,42 +41,10 @@ body {
     z-index: 1000;
 }
 
-.extern-nav-button {
-    position: absolute;
-    top: 0;
-    background-color: var(--nav-background);
-    box-shadow: var(--shadow-0);
-    cursor: pointer;
-    z-index: 250;
-    transition: all .2s;
-    height: 2.3rem;
-    width: 2.3rem;
-    display: grid;
-    place-content: center;
+.viewing .lock-on-view{
+    cursor:not-allowed !important;
+    opacity: .8 !important;
 }
-
-#home-button {
-    border-bottom-right-radius: 1rem;
-    left: 0;
-}
-
-#home-button:hover {
-    transform: scale(1.05);
-}
-
-#save-button {
-    border-bottom-left-radius: 1rem;
-    right: 0;
-}
-
-#save-button:hover {
-    transform: scale(1.05);
-}
-
-#save-button .save {
-    display: none;
-}
-
 /* #endregion */
 
 /*---------- popup ----------*/
@@ -580,7 +548,7 @@ body {
 }
 
 #map-marker-editor .delete{
-    right: 1.3rem;
+    right: 1.5rem;
     top: .4rem;
 }
 
@@ -957,6 +925,42 @@ nav ul li::marker {
 
 #toggel-editmode:hover {
     color: rgb(211, 200, 169);
+}
+
+.extern-nav-button {
+    position: absolute;
+    top: 0;
+    background-color: var(--nav-background);
+    box-shadow: var(--shadow-0);
+    cursor: pointer;
+    z-index: 250;
+    transition: all .2s;
+    height: 2.3rem;
+    width: 2.3rem;
+    display: grid;
+    place-content: center;
+}
+
+#home-button {
+    border-bottom-right-radius: 1rem;
+    left: 0;
+}
+
+#home-button:hover {
+    transform: scale(1.05);
+}
+
+#save-button {
+    border-bottom-left-radius: 1rem;
+    right: 0;
+}
+
+#save-button:hover {
+    transform: scale(1.05);
+}
+
+#save-button .save {
+    display: none;
 }
 
 /* #endregion */
