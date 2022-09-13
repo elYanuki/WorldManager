@@ -12,8 +12,9 @@ contextBridge.exposeInMainWorld("electronAPI", {
 
   //client to server
   save: () => ipcRenderer.send("save"),
-  saveEntry: (data, id) => ipcRenderer.send("save-entry", data, id),
+  saveEntry: (data, name, id) => ipcRenderer.send("save-entry", data, name, id),
   addEntry: (data, name) => ipcRenderer.send("add-entry", data, name),
+  deleteEntry: (data, uuid) => ipcRenderer.send("delete-entry", data, uuid),
   selectEntry: (id) => ipcRenderer.send("select-entry", id),
   selectWorld: (id) => ipcRenderer.send("select-world", id),
   saveWorldName: (name) => ipcRenderer.send("save-world-name", name),

@@ -153,7 +153,7 @@ app.whenReady().then(() => {
 
     newEntry = {
       "name" : name,
-      "category" : category,
+      "category" : "unused for now",
       "uuid" : uuidv4(),
       "data" : {time: Date.now(), blocks:[], version: '2.25.0'}
     }
@@ -162,17 +162,36 @@ app.whenReady().then(() => {
 
     sendWikiEntries()
 
-    updateJSON()
+    win.webContents.send('wiki-entry', JSON.stringify(worldData.entries[worldData.entries.length-1]))
+  })
+
+  ipcMain.on('delete-entry', (_event, uuid) => {
+    console.log("deleting world", uuid);
+
+    //translates uuid back to entry index
+    for (let i = 0; i < worldData.entries.length; i++) {
+      if(worldData.entries[i].uuid == uuid){
+        worldData.entries.splice(i, 1) //deletes selected entry from varaible data
+
+        sendWikiEntries()
+        win.webContents.send('wiki-entry', JSON.stringify(worldData.entries[0]))
+
+        return
+      }
+    }
+
+    console.log("entry doesnt exist");
   })
   
   //tells server to send next wiki entry
-  ipcMain.on('select-entry', (_event, id) => {
-    console.log("requesting entry", id);
+  ipcMain.on('select-entry', (_event, uuid) => {
+    console.log("requesting entry", uuid);
 
     console.log(worldData.entries);
 
+    //translates uuid back to entry index
     for (let i = 0; i < worldData.entries.length; i++) {
-      if(worldData.entries[i].uuid == id){
+      if(worldData.entries[i].uuid == uuid){
         win.webContents.send('wiki-entry', JSON.stringify(worldData.entries[i]))
         console.log("found", worldData.entries[i].data.blocks);
         return
@@ -184,12 +203,13 @@ app.whenReady().then(() => {
   })
   
   //saves wiki entry
-  ipcMain.on('save-entry', (_event, data, id) => {
+  ipcMain.on('save-entry', (_event, data, newName, id) => {
     console.log("getting new wiki data");
 
     for (let i = 0; i < worldData.entries.length; i++) {
       if(worldData.entries[i].uuid == id){
         worldData.entries[i].data = JSON.parse(data)
+        worldData.entries[i].name = newName
         console.log("found");
         return
       }
@@ -218,6 +238,7 @@ app.whenReady().then(() => {
   ///tells server to write all data stored in the worldData variable to the file
   ipcMain.on('save', (_event) => {
     updateJSON()
+    worldList[selectedWorldID] = worldData.name
     saveStatus = 1
     //TODO possible problem when saving of entry takes too long data gets write nbefore entry is recieved
   })
@@ -323,24 +344,16 @@ function deleteWorld(){
       fs.unlink(managerFolder + "/" + folderContent[selectedWorldID], function (err) {
         if (err) throw err;
         else console.log('World deleted!');
-    
-        //refreshes list of world files
-        folderContent = fs.readdirSync(managerFolder)
-        worldList = []
+
+        console.log(worldList, folderContent, selectedWorldID);
         
         for (let i = 0; i < folderContent.length; i++) {//reads content of every file and constructs array of worldnames
-          if (fs.existsSync(managerFolder + "/" + folderContent[i])) {
-            fs.readFile(managerFolder + "/"  + folderContent[i], 'utf-8', (err, data_string) => {
-                if (err) throw err;
-      
-                worldList[i] = JSON.parse(data_string).name
-                
-                if(i == folderContent.length-1){ //all worldnames collected - sending new world list to client
-                  sendWorldList()
-                }
-            })
-          }
-        }
+        worldList.splice(selectedWorldID,1)
+        folderContent.splice(selectedWorldID,1)
+        
+        console.log(worldList, folderContent);
+
+        sendWorldList()
       });
     }
   })

@@ -96,6 +96,9 @@
 
         <div id="map-marker-editor">
             <p class="close" onclick="closeMarkerEdit()">&#128473;</p>
+            <svg class="delete" width="1.5rem" height="1.5rem" title="delete marker" onclick="deletemarker()">
+                <image xlink:href="./icons/delete.svg" width="1.5rem" height="1.5rem"/>
+            </svg>
 
             <input name="marker-name" placeholder="Marker Name" type="text" class="marker-name" onfocus="this.select()">
             <label for="marker-link">Links to:</label>
@@ -125,7 +128,13 @@
             <!-- <div id="add-category">new Category</div> -->
         </aside>
 
-        <div id="entry-name"><input type="text"></div>
+        <div id="entry-name">
+            <input type="text" onblur="updateEntryName()">
+            <svg width="1.5rem" height="1.5rem"  id="delete-entry" title="delete entry" onclick="deleteEntry()">
+                <image xlink:href="./icons/delete.svg" width="1.5rem" height="1.5rem"/>
+            </svg>
+        </div>
+
         <div id="editjs" onkeydown="contentEdited()"></div>
     </section>
 

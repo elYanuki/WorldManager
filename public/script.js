@@ -30,6 +30,7 @@ const home = document.getElementById("home")
 const newWorld = document.getElementById("new-world")
 const newWorldError = newWorld.querySelector(".error")
 const newWorldInput = newWorld.querySelector("input")
+const entryNameInput = document.querySelector('#entry-name input')
 
 let mode = 0 //0 - map, 1 - wiki
 let editmode = 0 //0 - edit, 1 - view
@@ -75,16 +76,33 @@ window.electronAPI.requestSaveData((_event) => {
 
 window.electronAPI.wikiEntry((_event, data) => {
   if (data != null) {
-    let jsonData = JSON.parse(data)
-    console.log("recieved wikientry:", jsonData)
-    currentEntry = jsonData.uuid
+    editor.isReady
+      .then(() => {
+        let jsonData = JSON.parse(data)
+        console.log("recieved wikientry:", jsonData)
+        currentEntry = jsonData.uuid
+        entryNameInput.value = jsonData.name
+    
+        if(jsonData.data.blocks.length > 0){
+          editor.render(jsonData.data)
+        }
+        else{
+          editor.clear()
+        }
 
-    if(jsonData.data.blocks.length > 0){
-      editor.render(jsonData.data)
-    }
-    else{
-      editor.clear()
-    }
+        let entryListElems = asideContent.querySelectorAll('li')
+        for (let i = 0; i < wikiEntries.length; i++) {
+          if(wikiEntries[i].uuid == currentEntry){
+            entryListElems[i].classList.add("selected")
+          }
+          else{
+            entryListElems[i].classList.remove("selected")
+          }
+        }
+      })
+      .catch((reason) => {
+        console.log(`Editor.js initialization failed because of ${reason}`)
+      });
   }
 })
 
@@ -92,8 +110,17 @@ window.electronAPI.wikiEntryList((_event, data) => {
   console.log("wikientries recieved")
 
   wikiEntries = JSON.parse(data)
-  console.log(wikiEntries)
+  
+  console.log(wikiEntries);
+  
   reloadWikiEntries()
+
+  //sets values for "linksTo" selector for mapmarkers
+  let selectHTML = '<option value="null">nothing</option>'
+  for (let i = 0; i < wikiEntries.length; i++) {
+    selectHTML += `<option value="${wikiEntries[i].uuid}">${wikiEntries[i].name}</option>`
+  }
+  markerEditor.querySelector(".marker-link").innerHTML = selectHTML
 })
 
 ///all the data of world that was selected
@@ -133,6 +160,7 @@ window.electronAPI.world((_event, data) => {
 
   wikiEntries = jsonData.entries
   reloadWikiEntries()
+  entryNameInput.value = jsonData.entries[0].name
 
   mapMarkers = jsonData.markers
   reloadMarker()
@@ -156,6 +184,14 @@ window.electronAPI.worldList((_event, names, files) => {
 function loadWorldList() {
   home.style.display = "grid"
 
+  editor.isReady
+      .then(() => {
+        editor.clear()
+      })
+      .catch((reason) => {
+        console.log(`Editor.js initialization failed because of ${reason}`)
+      });
+
   if (worlds.length == 0) {
     // no worlds existing
     worldList.innerHTML =
@@ -163,7 +199,7 @@ function loadWorldList() {
   } else {
     let html = ""
     for (let i = 0; i < worlds.length; i++) {
-      html += `<div onclick="window.electronAPI.selectWorld(${i})"><p class="text">${worlds[i]}</p><p class="delete" title="delete world">&#128473;</p></div>`
+      html += `<div onclick="globalCursor('wait'); window.electronAPI.selectWorld(${i})"><p class="text">${worlds[i]}</p><p class="delete" title="delete world">&#128473;</p></div>`
     }
 
     worldList.innerHTML = html
@@ -356,10 +392,21 @@ function popup(type, data) {
   if (type == 0) {
     //input
     document.querySelector("#popup .content").innerHTML = `
-    <input type="text"  placeholder="name">
+    <input type="text" placeholder="name">
     <div class="buttons">
         <p onclick='${data.submit}; closePopup()'>submit</p>
         <p onclick='closePopup()'>cancel</p>
+    </div>`
+
+    document.querySelector('#popup input').focus()
+  }
+  if (type == 1) {
+    //confirm
+    document.querySelector("#popup .content").innerHTML = `
+    <p class="text">${data.text}</p>
+    <div class="buttons">
+      <p onclick='${data.confirm}; closePopup()'>confirm</p>
+      <p onclick='closePopup()'>cancel</p>
     </div>`
   }
 }
@@ -413,26 +460,26 @@ function setMapZoom(value) {
 
   mapImage.style.width = 70 * mapZoom + "vw" ///changes image size (zoom in)
 
-  if (mapZoom == 1 && mapImage.clientHeight < mapContainer.clientHeight) {
-    mapContainer.style.cursor = "default"
-  } //cursor reset if map is not zoomed in
-  else mapContainer.style.cursor = "grab" //since image is zoomed in user should know its movable
-
   //kinda lets you zoom into the center of the old view not the top corner
   //TODO improve centered zoom in
   mapContainer.scrollTop =
-    parseFloat(mapContainer.scrollTop) +
-    (parseFloat(mapImage.clientHeight) - safedSize.height) / 2
+  parseFloat(mapContainer.scrollTop) +
+  (parseFloat(mapImage.clientHeight) - safedSize.height) / 2
   mapContainer.scrollLeft =
-    parseFloat(mapContainer.scrollLeft) +
-    (parseFloat(mapImage.clientWidth) - safedSize.width) / 2
-
+  parseFloat(mapContainer.scrollLeft) +
+  (parseFloat(mapImage.clientWidth) - safedSize.width) / 2
+  
   //moves markers acording to new image size
   let markerHTML = mapContainer.querySelectorAll(".marker")
   for (let i = 0; i < mapMarkers.length; i++) {
     markerHTML[i].style.top = mapMarkers[i].top * mapZoom + "vw"
     markerHTML[i].style.left = mapMarkers[i].left * mapZoom + "vw"
   }
+  
+  if (mapZoom == 1 && mapImage.clientHeight < mapContainer.clientHeight) {
+    mapContainer.style.cursor = "default"
+  } //cursor reset if map is not zoomed in
+  else mapContainer.style.cursor = "grab" //since image is zoomed in user should know its movable
 
   closeMarkerHover()
 }
@@ -480,19 +527,23 @@ function mapMouseDown(e) {
 
 //creates new map marker
 function addMapMarker() {
-  mapMarkers.push({
-    top: 20,
-    left: 30,
-    name: "new Marker",
-    type: 0, //heading, label or pinpoint
-    linksTo: null,
-  })
+  if(editmode == 0){ //editmode is edit
+    mapMarkers.push({
+      top: 20,
+      left: 30,
+      name: "new Marker",
+      type: 0, //heading, label or pinpoint
+      linksTo: null,
+    })
 
-  reloadMarker() //displays addet marker
+    closeMarkerEdit()
 
-  contentEdited()
+    reloadMarker() //displays addet marker
 
-  saveMarkers()
+    contentEdited()
+
+    saveMarkers()
+  }
 }
 
 //displays every marker in "mapMarkers" var
@@ -548,9 +599,12 @@ function reloadMarker() {
   }
 }
 
-function clickMarker(elem) {
-  console.log("clicked marker")
-  loadWiki()
+function clickMarker(id) {
+  console.log("clicked marker", mapMarkers[id].linksTo)
+
+  if(mapMarkers[id].linksTo != "null" && mapMarkers[id].linksTo != null){ //linksto is nothing
+    swapEntry(mapMarkers[id].linksTo, true)
+  }
 }
 
 let hoveredMarker = null
@@ -621,6 +675,7 @@ function editMarker() {
     markerEditor.querySelector(".marker-name").value = mapMarkers[id].name
     markerEditor.querySelector(".marker-type").value = mapMarkers[id].type
     markerEditor.querySelector(".marker-link").value = mapMarkers[id].linksTo
+    
   } else {
     closeMarkerEdit()
   }
@@ -646,9 +701,11 @@ function closeMarkerEdit() {
   editing = false
 
   //resets marker highlighting
-  editingMarker.querySelector(".icon").style.color = "rgb(85, 72, 56)"
-  editingMarker.querySelector("p").style.textShadow =
-    "var(--shadow-markers-text), var(--shadow-markers-text), var(--shadow-markers-text)"
+  if(editingMarker != null){
+    editingMarker.querySelector(".icon").style.color = "rgb(85, 72, 56)"
+    editingMarker.querySelector("p").style.textShadow =
+      "var(--shadow-markers-text), var(--shadow-markers-text), var(--shadow-markers-text)"
+  }
 
   markerEditor.style.left = "-100%" //hides editor
 }
@@ -740,7 +797,7 @@ function moveMarker(elem, id, e) {
         mapMarkers[id].top = pxToVw(startpos.top) / mapZoom
         mapMarkers[id].left = pxToVw(startpos.left) / mapZoom
 
-        clickMarker(elem)
+        clickMarker(id)
 
         saveMarkers()
       }
@@ -791,15 +848,20 @@ function reloadWikiEntries() {
 
 function addEntry() {
   popup(0, {
-    submit:
-      'window.electronAPI.addEntry(document.querySelector("#popup .content input").value)',
+    submit:'window.electronAPI.addEntry(document.querySelector("#popup .content input").value); contentEdited()',
   })
 }
 
-//called when entry is clicked 
-//!fix thingy where data isnt saved propperly when only strg s not swaping (edit strng s home enter - works when edit strgs relode enter)
-function swapEntry(to) {
-  if(to != currentEntry || to == "save"){ //must be new entry or call is from the save function
+function deleteEntry() {
+  popup(1, {
+    confirm:'window.electronAPI.deleteEntry(currentEntry); contentEdited()',
+    text: 'Confirm deletion of this entry'
+  })
+}
+
+function swapEntry(to, force) {
+  if(to != currentEntry || to == "save" || force == true){ //must be new entry or call is from the save function or is forced since its called from a map marker
+    changeMode(1)
     //gets data from editor
     editor
       .save()
@@ -807,7 +869,7 @@ function swapEntry(to) {
         if(currentEntry != undefined){
           console.log("saving wiki - entry data: ", outputData)
 
-          window.electronAPI.saveEntry(JSON.stringify(outputData), currentEntry)
+          window.electronAPI.saveEntry(JSON.stringify(outputData), entryNameInput.value, currentEntry)
         }
       })
       .then(() => {
@@ -844,6 +906,16 @@ function toggleAside() {
     aside.querySelector("#add-entry").style.display = "none"
     aside.style.paddingRight = "1rem"
   }
+}
+
+function updateEntryName(){
+  wikiEntries.forEach(element => {
+    if(element.uuid == currentEntry){
+      element.name = entryNameInput.value
+      reloadWikiEntries()
+      return
+    }
+  });
 }
 
 function initEditor() {
