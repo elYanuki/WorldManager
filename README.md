@@ -1,6 +1,6 @@
 # WorldManager
 Allows you to create interactiv Maps and Wikis for offline Worldbuilding.
-project is currently still a work in progress but can do a some cool stuff already, you can try it by downloading [this .exe-File](https://drive.google.com/file/d/1NfQSQeSxdIdQjNENNO-APp6Tx4v6_t5f/view?usp=share_link) which actually isnt a virus I just havent figured out how to inform windows about that as well.
+project is currently still a work in progress but can do a some cool stuff already, you can try it by downloading [this .exe-File](https://drive.google.com/file/d/1IKBYJCbkF9gLz-8dsBo9Aga76S8CwVp4/view?usp=share_link) which actually isnt a virus I just havent figured out how to inform windows about that as well.
 
 ***
 
