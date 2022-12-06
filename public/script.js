@@ -249,7 +249,6 @@ function toggelEditMode() {
   let ps = editModeToggel.querySelectorAll("p")
   let markerHTML = document.querySelectorAll(".marker")
 
-  //TODO function for editjs
   editor.readOnly.toggle()
   //TODO lock of inputs
   //TODO disabel buttons (add marker etc.)
@@ -264,7 +263,7 @@ function toggelEditMode() {
       elem.classList.add("cursor-move")
     })
 
-    swapEntry(currentEntry, true)
+    swapEntry(currentEntry, true) //TODO automatically swaps to wiki on toggel
 
     /* document.body.classList.remove("viewing") */
   } else if (editmode == 0) {
@@ -734,10 +733,14 @@ let dragStartTime = Date.now()
 function moveMarker(elem, id, e) {
   e = e || window.event
 
-  if (e.target.closest(".marker") != null && editmode == 0) {
+  if (e.target.closest(".marker") != null ) {
+    if(editmode == 0){
     //if user clicked marker and editmode is edit
     e.preventDefault()
-
+    
+    document.onmouseup = closeDragMarker
+    document.onmousemove = dragMarker
+    
     dragStartTime = Date.now() //saves time when user clicked
 
     // get the mouse cursor position at startup:
@@ -746,8 +749,6 @@ function moveMarker(elem, id, e) {
     startpos.top = vwToPx(parseFloat(elem.style.top))
     startpos.left = vwToPx(parseFloat(elem.style.left))
 
-    document.onmouseup = closeDragMarker
-    document.onmousemove = dragMarker
 
     draggingMarker = true
     closeMarkerHover()
@@ -816,6 +817,10 @@ function moveMarker(elem, id, e) {
         saveMarkers()
       }
     }
+  }
+  else{
+    clickMarker(id)
+  }
   }
 }
 

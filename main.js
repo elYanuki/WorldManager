@@ -348,8 +348,9 @@ function deleteWorld(){
         console.log(worldList, folderContent, selectedWorldID);
         
         for (let i = 0; i < folderContent.length; i++) {//reads content of every file and constructs array of worldnames
-        worldList.splice(selectedWorldID,1)
-        folderContent.splice(selectedWorldID,1)
+          worldList.splice(selectedWorldID,1)
+          folderContent.splice(selectedWorldID,1)
+        }
         
         console.log(worldList, folderContent);
 
@@ -357,7 +358,6 @@ function deleteWorld(){
       });
     }
   })
-
 }
 
 function sendWorldList(){
