@@ -793,8 +793,8 @@ function moveMarker(elem, id, e) {
 
       //if mouse was moved more than 6 pixel or held down for more than 300ms
       if (
-        (Math.abs(startpos.x - e.clientX) > 6 &&
-          Math.abs(startpos.y - e.clientY) > 6) ||
+        Math.abs(startpos.x - e.clientX) > 6 || 
+        Math.abs(startpos.y - e.clientY) > 6 || 
         Date.now() - dragStartTime > 300
       ) {
         ///hovering marker
@@ -813,7 +813,7 @@ function moveMarker(elem, id, e) {
 
         clickMarker(id)
 
-        saveMarkers()
+        saveMarkers() //? maybe unnesecary
       }
     }
   }
