@@ -373,10 +373,11 @@ body {
     left: 0;
     overflow: visible;
     transform: translate(-50%, -100%);
+    cursor: pointer;
 }
 
 #map .marker.cursor-move {
-    cursor: move;
+    cursor: move !important;
 }
 
 #map .marker p {

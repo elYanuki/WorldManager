@@ -347,8 +347,15 @@ function deleteWorld(){
 
         console.log(worldList, folderContent, selectedWorldID);
         
+        //!Merge conflict kept both - dont know if loop is needet
         worldList.splice(selectedWorldID,1)
         folderContent.splice(selectedWorldID,1)
+
+        for (let i = 0; i < folderContent.length; i++) {//reads content of every file and constructs array of worldnames
+          worldList.splice(selectedWorldID,1)
+          folderContent.splice(selectedWorldID,1)
+        }
+        //!till here
         
         console.log(worldList, folderContent);
 
@@ -356,7 +363,6 @@ function deleteWorld(){
       });
     }
   })
-
 }
 
 function sendWorldList(){
